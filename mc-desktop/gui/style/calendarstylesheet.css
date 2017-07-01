@@ -1,0 +1,31 @@
+
+
+CalendarView QWidget {
+    background-color: #e6e6e6;
+}
+
+
+QCalendarWidget QToolButton {
+    height: 20px;
+    width: 100px;
+    color: white;
+    font-weight: bold;
+    icon-size: 56px, 56px;
+    background-color: #FBC02D; /*#2196F3;*/
+}
+
+QCalendarWidget QMenu {
+    width: 150px;
+    left: 20px;
+    background-color: white;
+}
+
+/*
+QCalendarWidget QMenu:enabled {
+    background-color: red;
+}*/
+
+QCalendarWidget QAbstractItemView {
+    selection-background-color: #FBC02D;
+}
+

@@ -1,0 +1,61 @@
+/* ---- TimelineHeader -------------------------------------------------------------------- */
+TimelineView QLabel {
+    background-color: transparent;
+}
+
+
+TimelineView TimelineHeader {
+    background-color: #FBC02D;
+    padding: 15px;
+}
+
+TimelineView TimelineHeader QLabel {
+    font-size: 14pt;
+    /*font-weight: bold;*/
+}
+
+TimelineView QToolButton {
+    background-color: transparent;
+    min-width: 10px;
+    max-width: 100px;
+}
+
+/* ---- TimelineContent ------------------------------------------------------------------- */
+
+TimelineView QScrollArea {
+    border: none;
+    background-color: none;
+}
+
+QListWidget {
+    background-color: #e6e6e6;
+}
+
+
+QListWidget:item:selected:active {
+    background: #BCCED4;
+}
+
+QListWidget:item:selected:!active {
+    background: gray;
+}
+
+QListWidget:item:selected:disabled {
+    background: gray;
+}
+
+QListWidget:item:selected:!disabled {
+    background: #BCCED4;
+}
+
+
+
+/* ---- ComboBox -------------------------------------------------------------------------- */
+
+QComboBox {
+    padding: 2px;
+}
+
+LabelWidget QPushButton {
+    width: 60px;
+}

@@ -1,0 +1,87 @@
+/*
+COLORS from app
+    primaryColor: #2196F3;
+    primaryDarkColor: #1976D2;
+    accentColor: #FBC02D;
+    formDescriptionTextColor: #676767;
+    colorErrorText: #ae2323;
+*/
+
+/* ---- MainWindow --------------------------------------------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Ubuntu Beta", "Bitstream Vera Sans", DejaVu Sans, Tahoma, sans-serif;
+    font-weight: lighter;
+    background-color: whitesmoke;
+    font-size: 11pt;
+}
+
+/*
+QMainWindow {
+    background-color: whitesmoke;
+}*/
+
+QSplitter::handle {
+    border: none;
+    height: 6px;
+    background-color: lightgray;
+}
+/* not working */
+QSplitter::handle:hover {
+    background-color: red;
+}
+
+
+QStatusBar {
+    background-color: lightgray;
+}
+QStatusBar QLabel {
+    background-color: transparent;
+}
+QToolBar {
+    padding: 5px;
+}
+QToolBar QToolButton {
+    padding: 5px;
+    min-width: 10px;
+    height: 15px;
+}
+
+
+
+/* ---- general Items -------------------------------------------------------------------- */
+
+
+QPushButton {
+    color: white;
+    background-color: green;
+    border: none;
+    padding: 8px;
+    min-width: 30px;
+    max-width: 100px;
+    border-radius: 2px;
+}
+
+QPushButton:disabled{ background-color: grey; }
+QPushButton:focus:pressed{ background-color: lightgreen; }
+
+/*
+QTextEdit {
+    border: none;
+    padding: 10px;
+}
+*/
+
+
+
+
+/*
+QFrame {
+    border: 0px solid firebrick;
+}*/
+/*
+QWidget:focus, QFrame:focus {
+    border: 1px solid firebrick;
+}*/
+

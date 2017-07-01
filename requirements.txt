@@ -1,0 +1,6 @@
+PyQt5
+sqlalchemy>=1.1
+python-weka-wrapper
+geopy
+pytz
+
