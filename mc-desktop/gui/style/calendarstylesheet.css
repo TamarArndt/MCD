@@ -1,23 +1,31 @@
 
 
 CalendarView QWidget {
-    background-color: #e6e6e6;
+    background-color: grayLightColor;
 }
 
-
+CalendarView QWidget#calendarNavBar {
+    background-color: accentYellowColor;
+}
 QCalendarWidget QToolButton {
-    height: 20px;
-    width: 100px;
+    height: 25px;
     color: white;
     font-weight: bold;
-    icon-size: 56px, 56px;
-    background-color: #FBC02D; /*#2196F3;*/
+    font-size: 11.5pt;
+    icon-size: 40px, 10px;
+    background-color: accentYellowColor;
 }
 
 QCalendarWidget QMenu {
+    font-weight: normal;
     width: 150px;
     left: 20px;
     background-color: white;
+    selection-color: black;
+    selection-background-color: grayMediumColor;
+}
+QCalendarWidget QToolButton::down-arrow {
+    image: none;
 }
 
 /*
@@ -25,7 +33,8 @@ QCalendarWidget QMenu:enabled {
     background-color: red;
 }*/
 
+
 QCalendarWidget QAbstractItemView {
-    selection-background-color: #FBC02D;
+    selection-background-color: accentYellowColor;
 }
 

@@ -1,6 +1,7 @@
 import os, sys
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSvg
-from gui.timelineview import timelineheader, timelinecontent
+from gui.timelineview import timelineheader, timelinecontent, waitingspinnerwidget
+from gui.style import styleparser
 
 '''
 The TimelineView is composed of:
@@ -13,15 +14,21 @@ The TimelineView is composed of:
 
 
 class TimelineView(QtWidgets.QWidget):
-    def __init__(self, appStatus, dbConnection):
+    def __init__(self, appStatus, dbConnection, mapview):
         QtWidgets.QWidget.__init__(self)
 
-        with open(os.path.join(os.path.dirname(sys.modules['__main__'].__file__) , './gui/style/timelinestylesheet.css'), 'r', encoding='utf-8') as file:
-            stylesheet = file.read()
-            self.setStyleSheet(stylesheet)
+        stylesheetFilename = 'timelinestylesheet.css'
+        processedstylesheetPath = styleparser.preprocessStylesheet(stylesheetFilename)
+        with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
+            processedstylesheet = file.read()
+            self.setStyleSheet(processedstylesheet)
 
         self.timelineHeader = timelineheader.TimelineHeader(appStatus)
-        self.timelineContent = timelinecontent.TimelineContent(appStatus, dbConnection)
+        self.timelineContent = timelinecontent.TimelineContent(appStatus, dbConnection, mapview)
+
+        # self.waitingSpinner = waitingspinnerwidget.QtWaitingSpinner(parent=self.timelineHeader)
+        # self.waitingSpinner.start()
+        # #self.timelineContent.loadingSignal[bool].connect(self.controlWaitingSpinner)
 
         scrollarea = QtWidgets.QScrollArea()
         scrollarea.setWidget(self.timelineContent)
@@ -32,5 +39,13 @@ class TimelineView(QtWidgets.QWidget):
         vlayout.addWidget(scrollarea)
         self.setLayout(vlayout)
 
+    # def controlWaitingSpinner(self, bool):
+    #     if bool:
+    #         print('starting')
+    #         self.waitingSpinner.start()
+    #     else:
+    #         print('stopping')
+    #         self.waitingSpinner.stop()
+    #
 
 

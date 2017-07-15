@@ -1,0 +1,102 @@
+/*
+COLORS from app
+    #2196F3: #2196F3;
+    #1976D2: #1976D2;
+    accentColor: #FBC02D;
+    formDescriptionTextColor: #676767;
+    colorErrorText: #ae2323;
+*/
+
+/* ---- MainWindow --------------------------------------------------------------------- */
+* {
+    font-family: "Ubuntu Beta", "Bitstream Vera Sans", DejaVu Sans, Tahoma, sans-serif;
+    /*font-weight: lighter;*/
+    font-size: 11pt;
+}
+
+QMainWindow QSplitter::handle {
+    border: none;
+    height: 6px;
+    background-color: #d3d3d3;
+}
+/* not working */
+QMainWindow QSplitter::handle:hover {
+    background-color: red;
+}
+
+
+QMainWindow QStatusBar {
+    background-color: #d3d3d3;
+}
+QMainWindow QStatusBar QLabel {
+    background-color: transparent;
+}
+QMainWindow QToolBar {
+    padding: 5px;
+}
+QMainWindow QToolBar QToolButton {
+    padding: 5px;
+    min-width: 10px;
+    height: 15px;
+}
+
+
+
+/* ---- some recurring items --------------------------------------------------------------------- */
+
+QPushButton {
+    background-color: white;
+    border: 1px solid #e6e6e6;
+    padding: 8px;
+    width: 90px;
+    border-radius: 3px;
+}
+
+QPushButton:disabled {
+    color: #d3d3d3;
+}
+QPushButton:focus:pressed {
+    background-color: #d3d3d3;
+}
+
+
+
+
+QPushButton#okButton {
+    background-color: #1976D2;
+    color: white;
+}
+
+
+
+
+QPushButton#okButton:disabled {
+    background-color: #e6e6e6;
+    color: #808080;
+    border: 1px solid #d3d3d3;
+}
+QPushButton#okButton:focus:pressed {
+    background-color: lightblue;
+}
+
+
+QPushButton#labelConfirmButton {
+    background-color: #1976D2;
+    color: white;
+    border: none;
+    width: 35px;
+    padding: 6px;
+}
+
+QPushButton#labelConfirmButton:disabled {
+    background-color: #e6e6e6;
+    color: darkgray;
+    border: 1px solid #d3d3d3;
+}
+QPushButton#labelConfirmButton:focus:pressed {
+    background-color: #d3d3d3;
+}
+
+QLabel[type='error'] {
+    color: #ae2323;
+}

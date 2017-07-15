@@ -1,0 +1,42 @@
+QFrame {
+    background-color: #d3d3d3;
+    border: none;
+}
+
+QSlider::handle:horizontal {
+    image: url(res/location_marker_split.svg);
+    width: 20px;
+    height: 25px;
+    margin: -10px 0;
+}
+/* make room for bigger handle */
+QSlider:horizontal {
+    min-height: 20px;
+    height: 35px;
+    background-color: transparent;
+}
+QSlider::groove:horizontal {
+    height: 10px;
+    border: none;
+}
+
+QSlider::add-page {
+    background: #808080;
+}
+QSlider::sub-page {
+    background-color: #FBC02D;
+}
+
+
+QPushButton {
+    color: white;
+    background-color: #008000;
+    border: none;
+    padding: 8px;
+    min-width: 30px;
+    max-width: 100px;
+    border-radius: 2px;
+}
+
+QPushButton:disabled{ background-color: #808080; }
+QPushButton:focus:pressed{ background-color: lightgreen; }

@@ -1,0 +1,150 @@
+/* ---- TimelineHeader -------------------------------------------------------------------- */
+TimelineView QLabel {
+    background-color: transparent;
+}
+
+
+TimelineView TimelineHeader {
+    background-color: #FBC02D;
+    padding: 15px;
+}
+
+TimelineView TimelineHeader QLabel {
+    font-size: 14pt;
+    /*font-weight: bold;*/
+}
+
+TimelineView QToolButton {
+    background-color: transparent;
+    min-width: 10px;
+    max-width: 100px;
+}
+
+/* ---- TimelineContent ------------------------------------------------------------------- */
+
+TimelineView QScrollArea {
+    border: none;
+    background-color: none;
+}
+
+
+QListWidget {
+    background-color: #e6e6e6
+}
+
+QListWidget:item {
+    border-bottom: 2px solid white;
+}
+
+QListWidget:item QFrame#selectionMarker {
+    background-color: green;
+}
+
+/*
+QListWidget:item:!selected QFrame .QLabel  {
+    background-color: #FBC02D;
+}*/
+
+
+/*
+QListWidget:item:!active { /*, :!disabled
+    background-color: #FBC02D;
+}*/
+
+/*
+Entry[type='Stop'] {
+    background-color: #d3d3d3;
+}
+Entry[type='Movement'] {
+    background-color: #e6e6e6;
+}
+
+*/
+
+/* ---- Label lists -------------------------------------------------------------------------- */
+
+/* confirmed */
+StopLabelWidget[isConfirmed='true'] QLabel{
+    color: gray;
+}
+/* not confirmed */
+StopLabelWidget[isConfirmed='false'] QLabel{
+    color: dodgerblue;
+}
+
+
+QComboBox[isConfirmed='true'] {
+    background-color: #C5D0D4; /*#B6C6CC; /* #8CCF76;*/
+    border-radius: 4px;
+}
+QComboBox[isConfirmed='false'] {
+    background-color: #3C63E6;
+}
+QComboBox[isConfirmed='true']:hover:focus {
+    background-color: #88BDCF;
+}
+QComboBox[isConfirmed='false']:hover:focus {
+    background-color: #0834C4;
+}
+
+
+QComboBox {
+    /*border: 2px solid #D4D4D4;*/
+    border: none;
+    font-size: 11pt;
+    padding: 5px;
+    color: black;
+    selection-background-color: #d3d3d3;
+}
+/* responds to arrow-down-button */
+QComboBox::drop-down {
+    width: 40px;
+    image: url(res/ei-chevron-down.svg);
+}
+
+QComboBox QAbstractItemView::item {
+    height: 15px;
+    padding-top: 0px;
+    margin-top: 10px;
+}
+
+/*
+QComboBox:on { /* selected item when list elapsed
+    color: #ae2323;
+    selection-color: green;
+    /*background-color: #ae2323;*/
+    /*selection-background-color: #ffaa00;*/
+/*} */
+/*
+QComboBox:off {
+    selection-background-color: #ffaa00;
+    background-color: red; /* this makes the separator and icons red !
+}*/
+
+/* ausgeklappte liste */
+
+/*
+QComboBox QAbstractItemView::item {
+    min-height: 50px;
+}
+QAbstractItemView::item {
+    color: black;
+    background-color: lightgray;
+    min-height: 50px;
+}
+*/
+
+/* ausgeklappte liste
+QComboBox QListView::item {
+    padding: 5px;
+    margin: 10px;
+}*/
+
+/*
+QComboBox QAbstractItemDelegate {
+    background-color: red;
+}*/
+/*
+QComboBox:hover {
+    background-color: #FBC02D;
+}*/

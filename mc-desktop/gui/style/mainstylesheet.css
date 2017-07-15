@@ -9,40 +9,32 @@ COLORS from app
 
 /* ---- MainWindow --------------------------------------------------------------------- */
 * {
-    margin: 0;
-    padding: 0;
     font-family: "Ubuntu Beta", "Bitstream Vera Sans", DejaVu Sans, Tahoma, sans-serif;
-    font-weight: lighter;
-    background-color: whitesmoke;
+    /*font-weight: lighter;*/
     font-size: 11pt;
 }
 
-/*
-QMainWindow {
-    background-color: whitesmoke;
-}*/
-
-QSplitter::handle {
+QMainWindow QSplitter::handle {
     border: none;
     height: 6px;
-    background-color: lightgray;
+    background-color: grayMediumColor;
 }
 /* not working */
-QSplitter::handle:hover {
+QMainWindow QSplitter::handle:hover {
     background-color: red;
 }
 
 
-QStatusBar {
-    background-color: lightgray;
+QMainWindow QStatusBar {
+    background-color: grayMediumColor;
 }
-QStatusBar QLabel {
+QMainWindow QStatusBar QLabel {
     background-color: transparent;
 }
-QToolBar {
+QMainWindow QToolBar {
     padding: 5px;
 }
-QToolBar QToolButton {
+QMainWindow QToolBar QToolButton {
     padding: 5px;
     min-width: 10px;
     height: 15px;
@@ -50,38 +42,61 @@ QToolBar QToolButton {
 
 
 
-/* ---- general Items -------------------------------------------------------------------- */
-
+/* ---- some recurring items --------------------------------------------------------------------- */
 
 QPushButton {
-    color: white;
-    background-color: green;
-    border: none;
+    background-color: white;
+    border: 1px solid grayLightColor;
     padding: 8px;
-    min-width: 30px;
-    max-width: 100px;
-    border-radius: 2px;
+    width: 90px;
+    border-radius: 3px;
 }
 
-QPushButton:disabled{ background-color: grey; }
-QPushButton:focus:pressed{ background-color: lightgreen; }
+QPushButton:disabled {
+    color: grayMediumColor;
+}
+QPushButton:focus:pressed {
+    background-color: grayMediumColor;
+}
 
-/*
-QTextEdit {
+
+
+
+QPushButton#okButton {
+    background-color: primaryDarkColor;
+    color: white;
+}
+
+
+
+
+QPushButton#okButton:disabled {
+    background-color: grayLightColor;
+    color: grayDarkColor;
+    border: 1px solid grayMediumColor;
+}
+QPushButton#okButton:focus:pressed {
+    background-color: lightblue;
+}
+
+
+QPushButton#labelConfirmButton {
+    background-color: primaryDarkColor;
+    color: white;
     border: none;
-    padding: 10px;
+    width: 35px;
+    padding: 6px;
 }
-*/
 
+QPushButton#labelConfirmButton:disabled {
+    background-color: grayLightColor;
+    color: darkgray;
+    border: 1px solid grayMediumColor;
+}
+QPushButton#labelConfirmButton:focus:pressed {
+    background-color: grayMediumColor;
+}
 
-
-
-/*
-QFrame {
-    border: 0px solid firebrick;
-}*/
-/*
-QWidget:focus, QFrame:focus {
-    border: 1px solid firebrick;
-}*/
-
+QLabel[type='error'] {
+    color: errorColor;
+}

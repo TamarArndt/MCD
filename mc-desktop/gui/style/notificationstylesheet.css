@@ -1,0 +1,15 @@
+
+
+QLabel {
+    padding: 20px;
+}
+QLabel[status='noEntries'] {
+    background-color: notificationNoDetectionColor;
+}
+QLabel[status='fullyLabeled'] {
+    background-color: notificationFullyLabeledColor;
+}
+QLabel[status='partiallyLabeled'] {
+    background-color: notificationPartiallyLabeledColor;
+}
+

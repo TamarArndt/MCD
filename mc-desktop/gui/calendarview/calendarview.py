@@ -1,6 +1,6 @@
 import os, sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from gui.style import styleparser
 
 class CalendarView(QtWidgets.QWidget):
     def __init__(self, appStatus):
@@ -15,8 +15,6 @@ class CalendarView(QtWidgets.QWidget):
         vlayout.addWidget(self.calendar)
         vlayout.addStretch(1)
         self.setLayout(vlayout)
-
-
 
 
 class MyCalendar(QtWidgets.QCalendarWidget):
@@ -36,13 +34,15 @@ class MyCalendar(QtWidgets.QCalendarWidget):
         self.setMaximumDate(range[1])
 
         # style
-        with open(os.path.join(os.path.dirname(sys.modules['__main__'].__file__) , './gui/style/calendarstylesheet.css'), 'r', encoding='utf-8') as file:
-            stylesheet = file.read()
-            self.setStyleSheet(stylesheet)
+        stylesheetFilename = 'calendarstylesheet.css'
+        processedstylesheetPath = styleparser.preprocessStylesheet(stylesheetFilename)
+        with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
+            processedstylesheet = file.read()
+            self.setStyleSheet(processedstylesheet)
 
         self.setFixedHeight(210)
         self.setFixedWidth(240)
-        # maybe set this relative to available screen
+        # maybe set this relative to available screen, but needs to be fixed somehow.
         # see: desktop = QtWidgets.QDesktopWidget(), desktop.primaryScreen()), desktop.availableGeometry(self)
 
         #self.setHorizontalHeaderFormat(QtWidgets.QCalendarWidget.SingleLetterDayNames)
@@ -55,9 +55,12 @@ class MyCalendar(QtWidgets.QCalendarWidget):
 
         # style calendar arrows (in a somewhat cumbersome way, but seems to be the only one)
         calendarNavBar = self.findChild(QtWidgets.QWidget, "qt_calendar_navigationbar")
+        calendarNavBar.setObjectName('calendarNavBar')
         if calendarNavBar:
             nextMonth = calendarNavBar.findChild(QtWidgets.QWidget, "qt_calendar_nextmonth")
             prevMonth = calendarNavBar.findChild(QtWidgets.QWidget, "qt_calendar_prevmonth")
+            monthButton = calendarNavBar.findChild(QtWidgets.QWidget, "qt_calendar_monthbutton")
+            monthButton.setObjectName('monthButton')
             if nextMonth:
                 nextMonth.setArrowType(QtCore.Qt.RightArrow)
             if prevMonth:

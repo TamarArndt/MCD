@@ -1,10 +1,10 @@
 QFrame {
-    background-color: lightgrey;
+    background-color: grayMediumColor;
     border: none;
 }
 
 QSlider::handle:horizontal {
-    image: url("./res/location_marker_split.svg");
+    image: url(locationSplitMarkerPath);
     width: 20px;
     height: 25px;
     margin: -10px 0;
@@ -21,8 +21,22 @@ QSlider::groove:horizontal {
 }
 
 QSlider::add-page {
-    background: grey;
+    background: grayDarkColor;
 }
 QSlider::sub-page {
-    background-color: #FBC02D;
+    background-color: accentYellowColor;
 }
+
+
+QPushButton {
+    color: white;
+    background-color: accentGreenColor;
+    border: none;
+    padding: 8px;
+    min-width: 30px;
+    max-width: 100px;
+    border-radius: 2px;
+}
+
+QPushButton:disabled{ background-color: grayDarkColor; }
+QPushButton:focus:pressed{ background-color: lightgreen; }

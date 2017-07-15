@@ -11,6 +11,8 @@ class TimelineHeader(QtWidgets.QFrame):
         self.dateIncrement = QtWidgets.QToolButton()
         self.dateDecrement.setArrowType(QtCore.Qt.LeftArrow)
         self.dateIncrement.setArrowType(QtCore.Qt.RightArrow)
+        self.dateDecrement.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.dateIncrement.setFocusPolicy(QtCore.Qt.ClickFocus)
 
         hlayout = QtWidgets.QHBoxLayout()
         hlayout.setContentsMargins(0, 0, 0, 0)
@@ -23,7 +25,6 @@ class TimelineHeader(QtWidgets.QFrame):
 
         self.dateDecrement.pressed.connect(lambda: self.dateLabelChange(False))
         self.dateIncrement.pressed.connect(lambda: self.dateLabelChange(True))
-
 
     def updateDateLabel(self, date):
         """ to be called from mainpage when calendar changed """
@@ -44,7 +45,6 @@ class TimelineHeader(QtWidgets.QFrame):
         self.dateLabel.currentDate = newday
         self.dateLabel.updateDateLabel(newday)
         self.dateLabel.speak.emit(newday)
-
 
 
 class DateLabel(QtWidgets.QLabel):
