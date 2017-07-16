@@ -27,7 +27,7 @@ class MainPage(QtWidgets.QWidget):
 
         self.waitingSpinner = waitingspinnerwidget.QtWaitingSpinner(parent=self.calendar_view)
         self.waitingSpinner.start()
-        self.timeline_view.timelineContent.loadingSignal[bool].connect(self.controlWaitingSpinner)
+        #self.timeline_view.timelineContent.loadingSignal[bool].connect(self.controlWaitingSpinner)
 
 
         splitter = QtWidgets.QSplitter()
@@ -45,20 +45,7 @@ class MainPage(QtWidgets.QWidget):
         # Manage connections between components:
         # - communicate datechange between calendar, timelineHeader, mapview and appStatus object
         self.communicateDateChange(appStatus, dbConnection)
-
         self.map_view.splitSignal.connect(lambda: self.actionsInCaseOfSplitEvent(appStatus, dbConnection))
-
-
-        #self.installEventFilter(self) #MyEventFilter())
-        #self.calendar_view.calendar.installEventFilter(self)
-        #self.timeline_view.timelineContent.timeline.installEventFilter(self)
-        #self.calendar_view.installEventFilter(self)
-
-        #print(self.calendar_view.calendar.children())
-        # for obj in self.children():
-        #     obj.installEventFilter(self)
-
-
 
     def communicateDateChange(self, appStatus, dbConnection):
         calendarinstance = self.calendar_view.calendar
@@ -97,51 +84,3 @@ class MainPage(QtWidgets.QWidget):
         else:
             #print('stopping')
             self.waitingSpinner.stop()
-
-
-
-    # -------------------------------------------------------------------------
-    # KeyEvent management
-    # -------------------------------------------------------------------------
-    def eventFilter(self, targetObject, event):
-
-        mCalendar = self.calendar_view.calendar
-        mTimeline = self.timeline_view.timelineContent.timeline
-
-        # if event.type() == QtCore.QEvent.ChildAdded:
-        #     childEvent = QtCore.QChildEvent(event)
-        #     childEvent.child().installEventFilter(self)
-        #     print('child added', childEvent.child())
-        #     pass
-
-        if event.type() == QtCore.QEvent.MouseButtonPress:
-            print('mouse button pressed')
-        #if event.type() == QtCore.QEvent.MouseButtonPress:
-        #    print(event, targetObject)
-
-        #if not event.type() == QtGui.QPaintEvent:
-            #print(targetObject, ' : ', event, ' : ', event.type())
-        #from eventloggingusertest import eventlogging
-
-
-        #mCalendar.installEventFilter(self)
-        #mTimeline.installEventFilter(self)
-
-        #if event.type() == QtCore.QEvent.MouseButtonPress:
-        #    print('mouse event')
-        #
-        # if targetObject == mCalendar:
-        #     print('mCalendar got event')
-        #     if type(event) == QtCore.QEvent.MouseButtonPress:
-        #         print('and it was a mouse button press')
-        #         # cast ? QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        #         mouseEvent = QtGui.QMouseEvent(event)
-        #         currentTime = QtCore.QDateTime.currentDateTime()
-        #         eventlogging.logMousePress(targetObject, currentTime)
-
-        return False #targetObject.eventFilter(targetObject, event)
-
-        # eventFilter:
-        # preprocess the events you are interested in
-        # return False (dont actually filter anything out)
-

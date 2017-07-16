@@ -29,13 +29,13 @@ class MapView(QtWidgets.QWidget):
         for entry in currentDateEntries:
             if entry['type'] == 'Stop':
                 clusterId = entry['value'].idCluster
-                centroid = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
-                geom = centroid[0]
+                geom = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
                 markersdictlist.append({'longitude': geom['coordinates'][0], 'latitude': geom['coordinates'][1]})
             if entry['type'] == 'Movement':
                 id = entry['value'].id
                 subpath = dbqueries.getMovementPathForMovementId(self.dbConnection, appStatus, id)
                 for point in subpath:
+                    print('mvmt:', point)
                     geom = point['geom']
                     pathdictlist.append({'longitude': geom['coordinates'][0], 'latitude': geom['coordinates'][1]})
 
@@ -52,8 +52,7 @@ class MapView(QtWidgets.QWidget):
 
         if currentDateEntry['type'] == 'Stop':
             clusterId = currentDateEntry['value'].idCluster
-            centroid = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
-            geom = centroid[0]
+            geom = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
             markersdictlist.append({'longitude': geom['coordinates'][0], 'latitude': geom['coordinates'][1]})
 
         elif currentDateEntry['type'] == 'Movement':

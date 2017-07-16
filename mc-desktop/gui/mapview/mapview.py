@@ -36,8 +36,7 @@ class MapView(QtWidgets.QWidget):
         for entry in currentDateEntries:
             if entry['type'] == 'Stop':
                 clusterId = entry['value'].idCluster
-                centroid = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
-                geom = centroid[0]
+                geom = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
                 markersdictlist.append({'longitude': geom['coordinates'][0], 'latitude': geom['coordinates'][1]})
             if entry['type'] == 'Movement':
                 id = entry['value'].id
@@ -61,8 +60,7 @@ class MapView(QtWidgets.QWidget):
             #self.removeSplitWidget()
             self.split.setHidden(True)
             clusterId = currentDateEntry['value'].idCluster
-            centroid = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
-            geom = centroid[0]
+            geom = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
             markersdictlist.append({'longitude': geom['coordinates'][0], 'latitude': geom['coordinates'][1]})
 
         elif currentDateEntry['type'] == 'Movement':

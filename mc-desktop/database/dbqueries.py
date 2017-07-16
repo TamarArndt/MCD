@@ -79,9 +79,13 @@ def getClusterNameForId(dbConnection, clusterId):
 
 
 def getClusterForId(dbConnection, appStatus, clusterId):
-    #session = dbConnection.Session()
-    #cluster_area = spatiaquery.spatiaQuery('SELECT AsGeoJSON(cluster_area, 6) FROM cluster WHERE id=' + str(clusterId) + ';')
-    cluster_centroid = spatiaquery.spatiaQuery('SELECT AsGeoJSON(centroid, 6) FROM cluster WHERE id=' + str(clusterId) + ';')
+    if appStatus.usertestMode:
+        session = dbConnection.Session()
+        cluster_centroid = session.query(dbConnection.Cluster.centroid).filter(dbConnection.Cluster.id == clusterId).first()[0]
+        cluster_centroid = eval(cluster_centroid)
+        # in userttest mode this directly returns centroid in needed format [{'coordinates': [long, lat]}]
+    else:
+        cluster_centroid = spatiaquery.spatiaQuery('SELECT AsGeoJSON(centroid, 6) FROM cluster WHERE id=' + str(clusterId) + ';')[0]
     return cluster_centroid
 
 
@@ -94,11 +98,21 @@ def TravelModeForId(dbConnection, travelModeId):
 def getMovementPathForMovementId(dbConnection, appStatus, movementId):
     session = dbConnection.Session()
     path = session.query(dbConnection.MovementLocation).filter(dbConnection.MovementLocation.idMovement == movementId).all()
-    geoms = spatiaquery.spatiaQuery('SELECT AsGeoJSON(geom, 6) FROM movementLocation WHERE idMovement='+str(movementId)+';')
-    pathwithgeoms = []
-    for i in range(len(geoms)):
-        obj = {'id': path[i].id, 'idMovement': path[i].idMovement, 'time': path[i].time, 'geom': geoms[i]}
-        pathwithgeoms.append(obj)
+    if not appStatus.usertestMode:
+        geoms = spatiaquery.spatiaQuery('SELECT AsGeoJSON(geom, 6) FROM movementLocation WHERE idMovement='+str(movementId)+';')
+        pathwithgeoms = []
+        for i in range(len(geoms)):
+            obj = {'id': path[i].id, 'idMovement': path[i].idMovement, 'time': path[i].time, 'geom': geoms[i]}
+            pathwithgeoms.append(obj)
+
+    if appStatus.usertestMode:
+        pathwithgeoms = []
+        for i in range(len(path)):
+            obj = {'id': path[i].id, 'idMovement': path[i].idMovement, 'time': path[i].time, 'geom': path[i].geom}
+            pathwithgeoms.append(obj)
+        for subpath in pathwithgeoms:
+            subpath['geom'] = eval(subpath['geom'])
+
     return pathwithgeoms
 
 
@@ -139,3 +153,10 @@ def isClusterIdAssociatedWithPlaceTypeLabel(dbConnection, clusterId, placeTypeLa
     res = session.query(exists().where(and_(dbConnection.ClusterTypeLookupTable.cluster_id == clusterId,
                                             dbConnection.ClusterTypeLookupTable.place_type_label == placeTypeLabel))).scalar()
     return res
+
+
+# only used in usertestMode
+def getLabelConfidencesForStopId(dbConnection, stopId):
+    session = dbConnection.Session()
+    labelConfidences = session.query(dbConnection.Stops.labelConfidences).filter(dbConnection.Stops.id == stopId).first()
+    return labelConfidences

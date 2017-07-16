@@ -60,8 +60,8 @@ class MapView(QtWidgets.QWidget):
         if currentDateEntry['type'] == 'Stop':
             self.split.setHidden(True)
             clusterId = currentDateEntry['value'].idCluster
-            cluster_area, centroid = dbqueries.getClusterForId(self.dbConnection, clusterId)
-            markergeoms = [centroid[0]]
+            centroid = dbqueries.getClusterForId(self.dbConnection, clusterId)
+            markergeoms = [centroid]
             self.mapspace.showOnMap([], markergeoms)
         elif currentDateEntry['type'] == 'Movement':
             self.split.setHidden(False)

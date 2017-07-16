@@ -32,7 +32,8 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
         elif not isConfirmed:
 
             if appStatus.adaptivityMode:
-                suggestions = self.getLabelSuggestionsIncludingClusterAssociationIfExistent(stopId, flagAutomaticLabeling,
+                suggestions = self.getLabelSuggestionsIncludingClusterAssociationIfExistent(dbConnection,
+                                                                                            stopId, flagAutomaticLabeling,
                                                                                             placeTypeLabel)
                 if not suggestions:  # if False returned: proceed the same way as in non-adaptive mode
                     print('no suggestions')
@@ -81,15 +82,17 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
         self.style().polish(self)
         self.update()
 
-    def getLabelSuggestionsIncludingClusterAssociationIfExistent(self, stopId, flagAutomaticLabeling, placeTypeLabel):
+    def getLabelSuggestionsIncludingClusterAssociationIfExistent(self, dbConnection, stopId, flagAutomaticLabeling, placeTypeLabel):
         """ returns a sorted list of the most probable labels
         if a cluster association exists, the associated label is integrated into the list, weighted by clusterAssociationWeight
         returns False if semantic place labeling can't provide the confidences """
-        classificationresult = True #semanticplacelabeling.getLabelConfidencesForStopId(stopId)
-        if not classificationresult:
+        #classificationresult = True #semanticplacelabeling.getLabelConfidencesForStopId(stopId)
+        # TODO just query LabelConfidences for stopId in Stops table (only usertestMode)
+        classificationresult = dbqueries.getLabelConfidencesForStopId(dbConnection=dbConnection, stopId=stopId)
+        if not classificationresult:  # if None
             return False
         else:
-            confidences = {'Friend & Family': 0.11539636746500072, 'Work': 0.08386752304450037, 'Home': 0.6879473186848128} #classificationresult['classification'][str(stopId)]
+            confidences = classificationresult #{'Friend & Family': 0.11539636746500072, 'Work': 0.08386752304450037, 'Home': 0.6879473186848128} #classificationresult['classification'][str(stopId)]
             # confidences is a dictionary of the form:
             # {'Friend & Family': 0.11539636746500072, 'Work': 0.08386752304450037, 'Home': 0.6879473186848128}
             if flagAutomaticLabeling == 1:  # there is a cluster-associated label

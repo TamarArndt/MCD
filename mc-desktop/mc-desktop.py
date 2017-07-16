@@ -28,13 +28,13 @@ if __name__ == '__main__':
         if args.usertestmode:
             usertestMode = args.usertestmode  # True
         else:
-            usertestMode = False
+            usertestMode = True #False
         if args.adaptivitymode:
             adaptivityMode = args.adaptivitymode  # True
         else:
-            adaptivityMode = True
+            adaptivityMode = False #True
 
-        logger.info("UsertestMode: %s | AdaptivityMode: %s", usertestMode, adaptivityMode )
+        logger.info("start programm | UsertestMode: %s | AdaptivityMode: %s", usertestMode, adaptivityMode )
         # --------------------------------------------------------------------------------
         # application
         # --------------------------------------------------------------------------------
@@ -56,12 +56,12 @@ if __name__ == '__main__':
         DB_PATH, JAR_PATH, MODEL_PATH = conf.accessConfig()
 
         # database path configuration dialog on startup
-        #dbPathConfigurationDialog = dbpathconfigurationonstartupdialog.DatabasePathConfig(DB_PATH)
-        #if dbPathConfigurationDialog.exec() == QtWidgets.QDialog.Rejected:
-        #    sys.exit(0)
+        dbPathConfigurationDialog = dbpathconfigurationonstartupdialog.DatabasePathConfig(DB_PATH)
+        if dbPathConfigurationDialog.exec() == QtWidgets.QDialog.Rejected:
+           sys.exit(0)
         # update configuration.ini if default db path changed
-        #if not DB_PATH == dbPathConfigurationDialog.db_path:
-        #    DB_PATH = dbPathConfigurationDialog.db_path
+        if not DB_PATH == dbPathConfigurationDialog.db_path:
+           DB_PATH = dbPathConfigurationDialog.db_path
 
         # --------------------------------------------------------------------------------
         # initalize a database connection
@@ -75,9 +75,9 @@ if __name__ == '__main__':
         # start main application window and welcome message
         # --------------------------------------------------------------------------------
         # optional welcome window
-        if usertestMode:
-            welcome = welcomewindow.WelcomeDialog(appStatus)
-            welcome.show()
+        # if usertestMode:
+        #     welcome = welcomewindow.WelcomeDialog(appStatus)
+        #     welcome.show()
 
         mainWindow = mainwindow.MainWindow(appStatus, dbConnection)
         mainWindow.show()
@@ -90,9 +90,9 @@ if __name__ == '__main__':
         app.exec_()
         sys.exit(0)
     except NameError:
-        logger.error(" Name Error: {}".format(sys.exc_info()))
+        logger.error("Name Error: {}".format(sys.exc_info()))
     except SystemExit:
-        logger.info(" Closing Window...")
+        logger.info("Closing Window...")
     except Exception as e:
-        logger.error(" Exception: {}".format(sys.exc_info()))
+        logger.error("Exception: {}".format(sys.exc_info()))
         traceback.print_exc(file=sys.stdout)
