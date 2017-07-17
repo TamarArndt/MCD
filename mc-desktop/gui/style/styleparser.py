@@ -24,7 +24,10 @@ replacements = {
 
     'locationMarkerPath': str(locationMarkerPath),
     'locationSplitMarkerPath': str(locationSplitMarkerPath),
-    'dropDownArrowPath': str(dropDownArrowPath)
+    'dropDownArrowPath': str(dropDownArrowPath),
+
+    'selectionColor': '#96D4A1', #BAD9C0', 88C292
+    'headerColor': '#ffb600'
 }
 
 

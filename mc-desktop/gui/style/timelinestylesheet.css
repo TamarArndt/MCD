@@ -5,7 +5,7 @@ TimelineView QLabel {
 
 
 TimelineView TimelineHeader {
-    background-color: accentYellowColor;
+    background-color: headerColor;
     padding: 15px;
 }
 
@@ -38,7 +38,7 @@ QListWidget:item {
 }*/
 
 QListWidget:item:selected {
-    background-color: accentYellowColor;
+    background-color: selectionColor;
 }
 
 /*
@@ -57,14 +57,13 @@ QListWidget:item:!active { /*, :!disabled
     background-color: accentYellowColor;
 }*/
 
-/*
+/* disables item-selection color
 Entry[type='Stop'] {
     background-color: grayMediumColor;
 }
 Entry[type='Movement'] {
     background-color: grayLightColor;
 }
-
 */
 
 /* ---- Label lists -------------------------------------------------------------------------- */

@@ -28,11 +28,11 @@ if __name__ == '__main__':
         if args.usertestmode:
             usertestMode = args.usertestmode  # True
         else:
-            usertestMode = False #False
+            usertestMode = True #False
         if args.adaptivitymode:
             adaptivityMode = args.adaptivitymode  # True
         else:
-            adaptivityMode = True
+            adaptivityMode = False
 
         logger.info("start programm | UsertestMode: %s | AdaptivityMode: %s", usertestMode, adaptivityMode )
         # --------------------------------------------------------------------------------

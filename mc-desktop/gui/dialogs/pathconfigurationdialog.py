@@ -75,10 +75,10 @@ class PathConfigurationDialog(QtWidgets.QDialog):
 
         # ----------------------------------------------------
         # Cancel and Done button
-        cancelbutton = guielements.QtWidgets.QPushButton("Cancel")
+        cancelbutton = QtWidgets.QPushButton("Cancel")
         cancelbutton.clicked.connect(self.reject)
         self.okbutton = QtWidgets.QPushButton("Done")
-        self.okButton.setObjectName('okButton')
+        self.okbutton.setObjectName('okButton')
         self.okbutton.clicked.connect(self.submitChanges)
         QtWidgets.QShortcut(QtGui.QKeySequence("Enter"), self, self.okbutton.click)
 

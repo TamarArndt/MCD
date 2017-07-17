@@ -23,8 +23,10 @@ class Timeline(QtWidgets.QListWidget):
             # generate EntryWidget for each entry
             if entry['type'] == 'Stop':
                 entryWidget = StopEntry(entry, dbConnection, appStatus, listItem)
+                listItem.setBackground(QtGui.QColor(218, 222, 230))
             elif entry['type'] == 'Movement':
                 entryWidget = MovementEntry(entry, dbConnection, appStatus, listItem)
+                listItem.setBackground(QtGui.QColor(245, 245, 245))
 
             listItem.indexInEntryList = index
             listItem.entryWidget = entryWidget
@@ -70,39 +72,27 @@ class MyListWidgetItem(QtWidgets.QListWidgetItem):
 
 
 class Entry(QtWidgets.QFrame):
-    def __init__(self, time, icon, info, labelwidget, type): #info, labelwidget, type):
+    def __init__(self, time, icon, info, labelwidget, type):
         QtWidgets.QFrame.__init__(self)
 
         self.setProperty('type', type)
-
-        self.labelwidget = labelwidget #contentwidget.labelwidget
-        self.selectionMarker = QtWidgets.QFrame()
-        self.selectionMarker.setObjectName('selectionMarker')
-        self.selectionMarker.setFixedWidth(13)
-        #self.selectionMarker.setStyleSheet('QFrame {background-color: blue;}')
+        self.labelwidget = labelwidget
 
         hlayout = QtWidgets.QHBoxLayout()
-        hlayout.setContentsMargins(0, 0, 0, 0)
-        #hlayout.addSpacing(10)
+        hlayout.setContentsMargins(10, 0, 10, 0)
         time.setFixedWidth(48)
-        hlayout.addWidget(self.selectionMarker, 0)
         hlayout.addWidget(time, 0)
+        icon.setFixedWidth(icon.sizeHint().width())
         hlayout.addWidget(icon, 0)
+        hlayout.addSpacing(10)
 
-        info.setFixedWidth(140)
-            # if type == 'Movement':
-            #     pass
-            #     #hlayout.addSpacing(20)
-            #     #info.setFixedWidth(110)
-            # #hlayout.addStretch(1)
+        maxsizeestimater = QtWidgets.QLabel('Auf der Morgenstelle 28')
+        info.setFixedWidth(maxsizeestimater.sizeHint().width()+15)
         hlayout.addWidget(info, 2)
-        hlayout.addStretch(2)
+        hlayout.addSpacing(10)
         hlayout.addWidget(labelwidget, 2)
-        hlayout.addStretch(7)
-        #hlayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
-
-        #hlayout.addWidget(contentwidget, 1)
-        #hlayout.setAlignment(contentwidget, QtCore.Qt.AlignLeft)
+        hlayout.setAlignment(labelwidget, QtCore.Qt.AlignCenter)
+        #hlayout.addStretch(1)
         self.setLayout(hlayout)
 
 
@@ -111,18 +101,14 @@ class StopEntry(Entry):
         value = stopentry['value']
         time = EntryTime(value.startTime, value.endTime)
 
-        stopicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'line.svg'))
-        stopcircle = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'stop.svg'), parent=stopicon)
-        stopcircle.move(0, 32)
+        stopicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_mvmt1.svg'))
+        stopcircle = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_stop.svg'), parent=stopicon)
 
         addressCommaSeparated = dbqueries.getClusterNameForId(dbConnection, value.idCluster)
         address = addressCommaSeparated.split(', ')
         address = "<br/>".join(address)
         info = QtWidgets.QLabel(str(address))
-        # TODO ?? xxx
         info.setWordWrap(True)
-        #info = QtWidgets.QLabel('<strong>' + str(address) + '</strong>')
-        info.setFixedWidth(140)
 
         isConfirmed = value.flagAutomaticLabeling == 2 or value.flagAutomaticLabeling == 3
         if appStatus.usertestMode:
@@ -137,12 +123,9 @@ class StopEntry(Entry):
                                                      dbConnection, appStatus,
                                                      correspondingListItem, addressCommaSeparated)
 
-        #stopContent = StopContent(info, labelwidget)
-
         super(StopEntry, self).__init__(time,
                                         stopicon,
                                         info, labelwidget,
-                                        #StopContent(info, labelwidget),
                                         'Stop')
 
 
@@ -151,24 +134,19 @@ class MovementEntry(Entry):
         value = movemententry['value']
         startTime, endTime, distance, duration, velocity = dbqueries.getMovementAttributesForMovementId(dbConnection, appStatus, value.id)
 
-        time = QtWidgets.QWidget() #EntryTime(startTime, endTime)
-        movementicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'line.svg'))
+        time = QtWidgets.QWidget()
+        movementicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_mvmt1.svg'))
 
         info = MvmtAttributes(distance, duration, velocity)
-        info.setFixedWidth(140)
-
         movementId = value.id
         travelModeLabel = dbqueries.TravelModeForId(dbConnection, value.idType)
         isConfirmed = not value.idType == 13  # 13: unknown
         labelwidget = labellists.MovementLabelWidget(movementId, travelModeLabel, isConfirmed,
                                                      dbConnection, appStatus, correspondingListItem)
 
-        #movementContent = MovementContent(info, labelwidget)
-
         super(MovementEntry, self).__init__(time,
                                             movementicon,
                                             info, labelwidget,
-                                            #MovementContent(info, labelwidget),
                                             'Movement')
 
 
@@ -215,35 +193,6 @@ class EntryTime(QtWidgets.QWidget):
         vlayout = QtWidgets.QVBoxLayout()
         vlayout.addWidget(entrytime)
         self.setLayout(vlayout)
-
-# -----------------------------------------------------------
-# content classes not in use
-class StopContent(QtWidgets.QFrame):
-    def __init__(self, address, stoplabelwidget):
-        QtWidgets.QFrame.__init__(self)
-        self.labelwidget = stoplabelwidget
-
-        self.setStyleSheet('QFrame {background-color: white; border: 1px solid darkgray; border-radius: 3px;}')
-        self.setFixedWidth(700)
-
-        hlayout = QtWidgets.QHBoxLayout()
-
-        hlayout.addWidget(address)
-        hlayout.addWidget(stoplabelwidget)
-        self.setLayout(hlayout)
-
-class MovementContent(QtWidgets.QFrame):
-    def __init__(self, attributes, movementlabelwidget):
-        QtWidgets.QFrame.__init__(self)
-        self.labelwidget = movementlabelwidget
-
-        #self.setStyleSheet('QFrame {background-color: blue;}')
-
-        hlayout = QtWidgets.QHBoxLayout()
-        hlayout.addWidget(attributes)
-        hlayout.addWidget(movementlabelwidget)
-        self.setLayout(hlayout)
-# -----------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------------------------------------------

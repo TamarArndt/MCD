@@ -9,8 +9,8 @@ COLORS from app
 
 /* ---- MainWindow --------------------------------------------------------------------- */
 * {
-    font-family: "Ubuntu Beta", "Bitstream Vera Sans", DejaVu Sans, Tahoma, sans-serif;
-    /*font-weight: lighter;*/
+    font-family: Tahoma, Geneva, Impact, Charcoal, sans-serif;
+    /*font-family: Arial, Helvetica, sans-serif; /* "Ubuntu Beta", "Bitstream Vera Sans", DejaVu Sans, Tahoma, sans-serif;*/
     font-size: 11pt;
 }
 
@@ -40,6 +40,15 @@ QMainWindow QToolBar QToolButton {
     height: 15px;
 }
 
+QDialog {
+    font-size: 14pt;
+}
+QTextEdit {
+    font-size: 12.5pt;
+    border: None;
+    background-color: transparent;
+    qproperty-readOnly: true;
+}
 
 
 /* ---- some recurring items --------------------------------------------------------------------- */

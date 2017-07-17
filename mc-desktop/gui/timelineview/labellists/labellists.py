@@ -69,9 +69,11 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
         self.combobox.currentIndexChanged.connect(lambda: self.indexChangedAction(dbConnection, appStatus,
                                                                                   stopId, self.combobox.currentText()))
 
-        vlayout = QtWidgets.QVBoxLayout()
-        vlayout.addWidget(self.combobox)
-        self.setLayout(vlayout)
+        hlayout = QtWidgets.QVBoxLayout()
+        hlayout.setContentsMargins(0, 0, 0, 0)
+        hlayout.addWidget(self.combobox)
+        hlayout.setAlignment(self.combobox, QtCore.Qt.AlignLeft)
+        self.setLayout(hlayout)
 
     def setConfirmed(self):
         self.isConfirmed = True
@@ -86,7 +88,7 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
         returns False if semantic place labeling can't provide the confidences """
         #classificationresult = True #semanticplacelabeling.getLabelConfidencesForStopId(stopId)
         # for usertest mode: just query LabelConfidences for stopId in Stops table
-        classificationresult = dbqueries.getLabelConfidencesForStopId(dbConnection=dbConnection, stopId=stopId)
+        classificationresult = eval(dbqueries.getLabelConfidencesForStopId(dbConnection=dbConnection, stopId=stopId)[0])
         if not classificationresult:  # if None
             return False
         else:
@@ -466,7 +468,6 @@ class MovementLabelList(QtWidgets.QComboBox):
         return QtWidgets.QComboBox.hidePopup(self)
 
     def keyPressEvent(self, keyEvent):
-        print('key pressed', 'is dropped down: ', self.isDroppedDown, 'key: ', keyEvent.key())
         if self.isDroppedDown:
             if keyEvent.key() == QtCore.Qt.Key_Space:
                 print('key space')

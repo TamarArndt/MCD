@@ -15,32 +15,17 @@ class AboutWindow(QtWidgets.QDialog):
 
         logo = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'mc-logo.svg'))
         logo.setFixedSize(100, 100)
-        aboutText = AboutInfo()
-
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(logo, 1)
-        layout.setAlignment(logo, QtCore.Qt.AlignCenter)
-        layout.addWidget(aboutText, 2)
-        self.setLayout(layout)
-
-
-class AboutInfo(QtWidgets.QTextEdit):
-    def __init__(self):
-        QtWidgets.QTextEdit.__init__(self)
-
-        self.setReadOnly(True)
-        self.setWordWrapMode(True)
-
-        # TODO standardise stuff like font-size !
-        self.setStyleSheet("QTextEdit {font-size: 12.5pt;}")
-        self.setFrameStyle(QtWidgets.QFrame.NoFrame)
-        self.viewport().setAutoFillBackground(False)
+        aboutText = QtWidgets.QTextEdit()
 
         content = "<h1 align=center> Mobility Companion Desktop </h1>" \
                   " <p align=center style='line-height: 120%;'> This application is an extension to the <i> Mobility Companion </i> Android App." \
                   " The data collected by the Mobility Companion app can be viewed and labeled with" \
                   " <i>Mobility Companion Desktop</i>." \
                   " Its' main purpose is to facilitate the labeling process. </p>"
+        aboutText.textCursor().insertHtml(content)
 
-
-        self.textCursor().insertHtml(content)
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(logo, 1)
+        layout.setAlignment(logo, QtCore.Qt.AlignCenter)
+        layout.addWidget(aboutText, 2)
+        self.setLayout(layout)
