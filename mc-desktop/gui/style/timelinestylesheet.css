@@ -32,13 +32,19 @@ QListWidget {
     background-color: grayLightColor
 }
 
+/*
 QListWidget:item {
     border-bottom: 2px solid white;
+}*/
+
+QListWidget:item:selected {
+    background-color: accentYellowColor;
 }
 
+/*
 QListWidget:item QFrame#selectionMarker {
     background-color: green;
-}
+}*/
 
 /*
 QListWidget:item:!selected QFrame .QLabel  {

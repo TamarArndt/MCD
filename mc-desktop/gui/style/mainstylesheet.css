@@ -60,15 +60,11 @@ QPushButton:focus:pressed {
 }
 
 
-
-
 QPushButton#okButton {
     background-color: primaryDarkColor;
     color: white;
+    /*width: 90px;*/
 }
-
-
-
 
 QPushButton#okButton:disabled {
     background-color: grayLightColor;
@@ -80,7 +76,8 @@ QPushButton#okButton:focus:pressed {
 }
 
 
-QPushButton#labelConfirmButton {
+
+QPushButton#smallButton {
     background-color: primaryDarkColor;
     color: white;
     border: none;
@@ -88,15 +85,27 @@ QPushButton#labelConfirmButton {
     padding: 6px;
 }
 
-QPushButton#labelConfirmButton:disabled {
+QPushButton#smallButton:disabled {
     background-color: grayLightColor;
     color: darkgray;
     border: 1px solid grayMediumColor;
 }
-QPushButton#labelConfirmButton:focus:pressed {
+QPushButton#smallButton:focus:pressed {
     background-color: grayMediumColor;
 }
 
+
 QLabel[type='error'] {
     color: errorColor;
+}
+
+
+QLabel#importantLabel {
+    font-weight: bold;
+    /*qproperty-alignment: AlignCenter;*/
+}
+
+QFrame#automaticLabelingQuestion {
+    background-color: white;
+    /*border: 2px solid errorColor;*/
 }

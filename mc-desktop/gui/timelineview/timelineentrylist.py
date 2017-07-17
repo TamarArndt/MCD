@@ -2,14 +2,9 @@ import os, sys
 import logging
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSvg
 from gui.timelineview.labellists import labellists
-from database import dbqueries
+from database import dbqueries, dbupdates
 from helper import timehelper
 from gui.style import iconfactory
-
-
-#logging.basicConfig(filename='myLogging.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
-
-#logger = logging.getLogger(__name__)
 
 
 class Timeline(QtWidgets.QListWidget):
@@ -19,12 +14,11 @@ class Timeline(QtWidgets.QListWidget):
         self.setFocusPolicy(QtCore.Qt.NoFocus)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setFrameStyle(QtWidgets.QFrame.NoFrame)
-        listHeight = 0
-        self.entryWidgets = []
+        self.listHeight = 0
 
         entryList = appStatus.currentDateEntries
-        for entry in entryList:
-            listItem = QtWidgets.QListWidgetItem()
+        for index, entry in enumerate(entryList):
+            listItem = MyListWidgetItem()
 
             # generate EntryWidget for each entry
             if entry['type'] == 'Stop':
@@ -32,26 +26,47 @@ class Timeline(QtWidgets.QListWidget):
             elif entry['type'] == 'Movement':
                 entryWidget = MovementEntry(entry, dbConnection, appStatus, listItem)
 
-            self.entryWidgets.append(entryWidget)
+            listItem.indexInEntryList = index
+            listItem.entryWidget = entryWidget
             listItem.setSizeHint(entryWidget.sizeHint())
             self.addItem(listItem)
             self.setItemWidget(listItem, entryWidget)
-            listHeight += listItem.sizeHint().height()
+            self.listHeight += listItem.sizeHint().height()
 
-        self.setFixedHeight(listHeight)
+        self.setFixedHeight(self.listHeight)
 
         # connections
-        self.establishTimelineMapConnection(appStatus, mapview)
-        self.currentRowChanged.connect(lambda: self.setFocusToCorrespondingLabelList(self.currentRow()))
+        self.currentRowChanged.connect(self.setFocusToCorrespondingLabelList)
+        self.currentRowChanged.connect(lambda: mapview.showSelectedEntryOnMap(appStatus, self.currentItem().indexInEntryList))
 
-    def establishTimelineMapConnection(self, appStatus, mapview):
-        self.currentRowChanged.connect(lambda: mapview.showSelectedEntryOnMap(appStatus, self.currentRow()))
-
-    def setFocusToCorrespondingLabelList(self, row):
-        logging.info(("current row: {}").format(self.currentRow()))
-        correspondingLabelList = self.entryWidgets[row].labelwidget.combobox
+    def setFocusToCorrespondingLabelList(self):
+        logging.info(("selected entry: {}").format(self.currentItem().indexInEntryList))
+        correspondingLabelList = self.currentItem().entryWidget.labelwidget.combobox
         correspondingLabelList.setFocus()
 
+    def insertAutoLabelQuestion(self, index, dbConnection, stopId, selectedLabel):
+        autoLabelQuestion = AutomaticLabelingQuestion(dbConnection, stopId, selectedLabel)
+        listItem = QtWidgets.QListWidgetItem()
+        listItem.setFlags(listItem.flags() & ~QtCore.Qt.ItemIsSelectable & ~QtCore.Qt.ItemIsEnabled)
+        listItem.setSizeHint(autoLabelQuestion.sizeHint())
+        self.insertItem(index, listItem)
+        self.setItemWidget(listItem, autoLabelQuestion)
+        self.listHeight += listItem.sizeHint().height()
+        self.setFixedHeight(self.listHeight)
+        autoLabelQuestion.finished.connect(lambda: self.removeAutoLabelQuestion(listItem, index))
+
+    def removeAutoLabelQuestion(self, listItem, index):
+        self.listHeight -= listItem.sizeHint().height()
+        self.removeItemWidget(listItem)
+        self.takeItem(index)
+        self.setFixedHeight(self.listHeight)
+
+
+class MyListWidgetItem(QtWidgets.QListWidgetItem):
+    def __init__(self):
+        QtWidgets.QListWidgetItem.__init__(self)
+        self.entryWidget = None
+        self.indexInEntryList = None
 
 
 class Entry(QtWidgets.QFrame):
@@ -201,7 +216,8 @@ class EntryTime(QtWidgets.QWidget):
         vlayout.addWidget(entrytime)
         self.setLayout(vlayout)
 
-
+# -----------------------------------------------------------
+# content classes not in use
 class StopContent(QtWidgets.QFrame):
     def __init__(self, address, stoplabelwidget):
         QtWidgets.QFrame.__init__(self)
@@ -216,7 +232,6 @@ class StopContent(QtWidgets.QFrame):
         hlayout.addWidget(stoplabelwidget)
         self.setLayout(hlayout)
 
-
 class MovementContent(QtWidgets.QFrame):
     def __init__(self, attributes, movementlabelwidget):
         QtWidgets.QFrame.__init__(self)
@@ -228,9 +243,39 @@ class MovementContent(QtWidgets.QFrame):
         hlayout.addWidget(attributes)
         hlayout.addWidget(movementlabelwidget)
         self.setLayout(hlayout)
+# -----------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------------------------------------------
 
-class AdaptiveLabelingDropIn(QtWidgets.QFrame):
-    pass
+class AutomaticLabelingQuestion(QtWidgets.QFrame):
+    finished = QtCore.pyqtSignal()
+    def __init__(self, dbConnection, stopId, selectedLabel):
+        QtWidgets.QFrame.__init__(self)
+        self.setObjectName('automaticLabelingQuestion')
+        self.setToolTip("If you don't want to be asked this question again, disable automatic labeling in the settings menu.")
+
+        question = QtWidgets.QLabel('Apply label "' + str(selectedLabel) + '" to all other unlabeled stops at this location?')
+        question.setWordWrap(True)
+        question.setObjectName('importantLabel')
+        nobutton = QtWidgets.QPushButton('No')
+        nobutton.setObjectName('smallButton')
+        nobutton.setFixedWidth(nobutton.sizeHint().width())
+        nobutton.clicked.connect(lambda: self.finished.emit())
+        yesbutton = QtWidgets.QPushButton('Yes')
+        yesbutton.setObjectName('smallButton')
+        yesbutton.setFixedWidth(yesbutton.sizeHint().width())
+        yesbutton.clicked.connect(lambda: self.accept(dbConnection, stopId, selectedLabel))
+
+        hlayout = QtWidgets.QHBoxLayout()
+        hlayout.addSpacing(2)
+        hlayout.addWidget(question)
+        hlayout.addWidget(nobutton)
+        hlayout.addSpacing(2)
+        hlayout.addWidget(yesbutton)
+        hlayout.addSpacing(2)
+        self.setLayout(hlayout)
+
+    def accept(self, dbConnection, stopId, selectedLabel):
+        dbupdates.newClusterPlaceTypeAssociation(dbConnection, stopId, selectedLabel)
+        self.finished.emit()

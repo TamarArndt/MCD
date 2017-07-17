@@ -40,9 +40,10 @@ def updateClusterTypeLookupTable(dbConnection, clusterId, associatedPlaceTypeId,
         session.commit()
 
 
-def newClusterPlaceTypeAssociation(dbConnection, stopId, associatedPlaceTypeId, associatedPlaceTypeLabel):
+def newClusterPlaceTypeAssociation(dbConnection, stopId, associatedPlaceTypeLabel):
     session = dbConnection.Session()
     clusterId = session.query(dbConnection.Stops.idCluster).filter(dbConnection.Stops.id == stopId).first()[0]
+    associatedPlaceTypeId = session.query(dbConnection.PlaceType.id).filter(dbConnection.PlaceType.place_type == associatedPlaceTypeLabel)
     updateClusterTypeLookupTable(dbConnection, clusterId, associatedPlaceTypeId, associatedPlaceTypeLabel)
     updateStopLabelsWithClusterAssociation(dbConnection, clusterId, associatedPlaceTypeId, associatedPlaceTypeLabel)
 

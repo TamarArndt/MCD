@@ -25,11 +25,6 @@ class MainPage(QtWidgets.QWidget):
         self.map_view = mapview.MapView(appStatus, dbConnection)
         self.timeline_view = timelineview.TimelineView(appStatus, dbConnection, self.map_view)
 
-        self.waitingSpinner = waitingspinnerwidget.QtWaitingSpinner(parent=self.calendar_view)
-        self.waitingSpinner.start()
-        #self.timeline_view.timelineContent.loadingSignal[bool].connect(self.controlWaitingSpinner)
-
-
         splitter = QtWidgets.QSplitter()
         splitter.addWidget(self.calendar_view)
         splitter.addWidget(self.timeline_view)
@@ -73,14 +68,3 @@ class MainPage(QtWidgets.QWidget):
         appStatus.updateApplicationStatus(dbConnection)
         self.timeline_view.timelineContent.updateTimelineContent(appStatus, dbConnection, self.map_view)
         self.timeline_view.timelineContent.timeline.setCurrentRow(row)
-
-    def controlWaitingSpinner(self, bool):
-        self.waitingSpinner = waitingspinnerwidget.QtWaitingSpinner(parent=self.calendar_view)
-        #print(bool)
-        #self.waitingSpinner.stop()
-        if bool:
-            #print('starting')
-            self.waitingSpinner.start()
-        else:
-            #print('stopping')
-            self.waitingSpinner.stop()

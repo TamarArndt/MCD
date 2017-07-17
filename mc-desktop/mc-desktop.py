@@ -28,11 +28,11 @@ if __name__ == '__main__':
         if args.usertestmode:
             usertestMode = args.usertestmode  # True
         else:
-            usertestMode = True #False
+            usertestMode = False #False
         if args.adaptivitymode:
             adaptivityMode = args.adaptivitymode  # True
         else:
-            adaptivityMode = False #True
+            adaptivityMode = True
 
         logger.info("start programm | UsertestMode: %s | AdaptivityMode: %s", usertestMode, adaptivityMode )
         # --------------------------------------------------------------------------------
@@ -68,23 +68,24 @@ if __name__ == '__main__':
         # set up application status object
         # --------------------------------------------------------------------------------
         dbConnection = dbconnection.DatabaseConnection(DB_PATH)
-        dbqueries.mergeConsecutiveMovementsWithSameTravelMode(dbConnection)
+        if not usertestMode:
+            dbqueries.mergeConsecutiveMovementsWithSameTravelMode(dbConnection)
         appStatus = applicationstatus.ApplicationStatus(dbConnection, usertestMode, adaptivityMode)
 
         # --------------------------------------------------------------------------------
         # start main application window and welcome message
         # --------------------------------------------------------------------------------
         # optional welcome window
-        # if usertestMode:
-        #     welcome = welcomewindow.WelcomeDialog(appStatus)
-        #     welcome.show()
+        if usertestMode:
+            welcome = welcomewindow.WelcomeDialog(appStatus)
+            welcome.show()
 
         mainWindow = mainwindow.MainWindow(appStatus, dbConnection)
         mainWindow.show()
 
         # Shortcuts
         QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Q"), mainWindow, app.quit)
-        calendarShortcut =  QtWidgets.QShortcut(QtGui.QKeySequence("Alt+c"), mainWindow)
+        calendarShortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Alt+c"), mainWindow)
         calendarShortcut.activated.connect(mainWindow.mainPage.calendar_view.calendar.setFocus)
 
         app.exec_()

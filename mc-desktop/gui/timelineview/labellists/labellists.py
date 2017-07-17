@@ -4,8 +4,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from semanticplacelabeling import semanticplacelabeling
 from gui.style import iconfactory
 from database import dbupdates, dbqueries
-from gui.dialogs import clusterassociatormessage
-
 
 # --------------------------------------------------------------------------------------------
 # Stop
@@ -87,12 +85,12 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
         if a cluster association exists, the associated label is integrated into the list, weighted by clusterAssociationWeight
         returns False if semantic place labeling can't provide the confidences """
         #classificationresult = True #semanticplacelabeling.getLabelConfidencesForStopId(stopId)
-        # TODO just query LabelConfidences for stopId in Stops table (only usertestMode)
+        # for usertest mode: just query LabelConfidences for stopId in Stops table
         classificationresult = dbqueries.getLabelConfidencesForStopId(dbConnection=dbConnection, stopId=stopId)
         if not classificationresult:  # if None
             return False
         else:
-            confidences = classificationresult #{'Friend & Family': 0.11539636746500072, 'Work': 0.08386752304450037, 'Home': 0.6879473186848128} #classificationresult['classification'][str(stopId)]
+            confidences = classificationresult
             # confidences is a dictionary of the form:
             # {'Friend & Family': 0.11539636746500072, 'Work': 0.08386752304450037, 'Home': 0.6879473186848128}
             if flagAutomaticLabeling == 1:  # there is a cluster-associated label
@@ -128,15 +126,16 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
                 clusterId = dbqueries.getClusterIdFromStopId(dbConnection, stopId)
                 alreadyAssociated = dbqueries.isClusterIdAssociatedWithPlaceTypeLabel(dbConnection, clusterId, newPlaceTypeLabel)
                 if not alreadyAssociated:
-                    logging.info("clusterAssociatorMessage")
-                    clusterassociatormessage.ClusterAssociatorMessage(self.address, newPlaceTypeLabel,
-                                                                      dbConnection, appStatus, stopId, newPlaceTypeId)
+                    logging.info("automaticLabelingQuestion shown")
+                    index = self.correspondingListItem.listWidget().currentRow() + 1
+                    self.correspondingListItem.listWidget().insertAutoLabelQuestion(index, dbConnection, stopId, newPlaceTypeLabel)
 
 
 class StopLabelWidget(QtWidgets.QWidget):
     def __init__(self, stopId, placeTypeLabel, isConfirmed, flagAutomaticLabeling,
                  dbConnection, appStatus, correspondingListItem, addressCommaSeparated):
         QtWidgets.QWidget.__init__(self)
+        self.correspondingListItem = correspondingListItem
         self.isConfirmed = isConfirmed
         self.address = addressCommaSeparated
         self.setProperty('isConfirmed', isConfirmed)
@@ -154,7 +153,7 @@ class StopLabelWidget(QtWidgets.QWidget):
         self.hintAutomaticLabeling.setFixedHeight(self.hintAutomaticLabeling.sizeHint().height())
         self.labelConfirmButton = QtWidgets.QPushButton('Ok')
         self.labelConfirmButton.setParent(self)
-        self.labelConfirmButton.setObjectName('labelConfirmButton')
+        self.labelConfirmButton.setObjectName('smallButton')
         self.labelConfirmButton.setEnabled(False)
         self.labelConfirmButton.clicked.connect(lambda: self.confirmAction(dbConnection, appStatus, stopId, placeTypeLabel))
 
@@ -259,7 +258,7 @@ class StopLabelWidget(QtWidgets.QWidget):
         if not classificationresult:
             return False
         else:
-            confidences = classificationresult['classification'][str(stopId)] #{'Friend & Family': 0.11539636746500072, 'Work': 0.08386752304450037, 'Home': 0.6879473186848128}
+            confidences = {'Friend & Family': 0.11539636746500072, 'Work': 0.08386752304450037, 'Home': 0.6879473186848128}  #classificationresult['classification'][str(stopId)]
             # confidences is a dictionary of the form:
             # {'Friend & Family': 0.11539636746500072, 'Work': 0.08386752304450037, 'Home': 0.6879473186848128}
             if flagAutomaticLabeling == 1:  # there is a cluster-associated label
@@ -300,8 +299,8 @@ class StopLabelWidget(QtWidgets.QWidget):
                 clusterId = dbqueries.getClusterIdFromStopId(dbConnection, stopId)
                 alreadyAssociated = dbqueries.isClusterIdAssociatedWithPlaceTypeLabel(dbConnection, clusterId, newPlaceTypeLabel)
                 if not alreadyAssociated:
-                    clusterassociatormessage.ClusterAssociatorMessage(self.address, newPlaceTypeLabel,
-                                                                      dbConnection, appStatus, stopId, newPlaceTypeId)
+                    index = self.correspondingListItem.listWidget().currentRow() + 1
+                    self.correspondingListItem.listWidget().insertAutoLabelQuestion(index, dbConnection, stopId, newPlaceTypeLabel)
 
     def confirmAction(self, dbConnection, appStatus, stopId, origPlaceTypeLabel):
         if not self.isConfirmed:
@@ -318,8 +317,8 @@ class StopLabelWidget(QtWidgets.QWidget):
             if not origPlaceTypeLabel == confirmedLabel:
                 # can be the case if cluster associated label also is the top suggestion
                 if appStatus.automaticLabelingMode:
-                    clusterassociatormessage.ClusterAssociatorMessage(self.address, confirmedLabel,
-                                                                      dbConnection, appStatus, stopId, confirmedLabelId)
+                    index = self.correspondingListItem.listWidget().currentRow() + 1
+                    self.correspondingListItem.listWidget().insertAutoLabelQuestion(index, dbConnection, stopId, origPlaceTypeLabel)
 
 
 class StopLabelList(QtWidgets.QComboBox):
@@ -413,7 +412,7 @@ class MovementLabelWidget(QtWidgets.QWidget):
         if not appStatus.usertestMode:
             # spacing workaround
             labelConfirmButton = QtWidgets.QPushButton('Ok')
-            labelConfirmButton.setObjectName('labelConfirmButton')
+            labelConfirmButton.setObjectName('smallButton')
             labelConfirmButton.hide()
             retainSizePolicy = labelConfirmButton.sizePolicy()
             retainSizePolicy.setRetainSizeWhenHidden(True)
@@ -480,9 +479,6 @@ class MovementLabelList(QtWidgets.QComboBox):
                 self.showPopup()
             elif keyEvent.key() == QtCore.Qt.Key_Down or keyEvent.key() == QtCore.Qt.Key_Up:
                 return self.correspondingListItem.listWidget().keyPressEvent(keyEvent)
-
-
-
 
 
     def confirm(self, appStatus):
