@@ -1,33 +1,28 @@
 import os, sys
 
-
 locationMarkerPath = os.path.join('res', 'location_marker.svg')
 locationSplitMarkerPath = os.path.join('res', 'location_marker_split.svg')  # TODO absolute path?
 dropDownArrowPath = os.path.join('res', 'ei-chevron-down.svg')
 
-
 replacements = {
-    'primaryColor': '#2196F3',
-    'primaryDarkColor': '#1976D2',
-    'accentYellowColor': '#FBC02D',
-    'accentYellowDarkColor': '#ffb600',
-    'accentGreenColor': '#008000',
-    'confirmedColor': '#8CCF76',  #?
-    'notconfirmedColor': '#E04848', #?
+    'primaryColor': '#87A6C9',
+    'primaryDarkColor': '#507EB1',
+    'selectionColor': '#96D4A1', #96D4A1
+    'confirmedColor': '#C7C7C7',
+    'notConfirmedColor': '#6192C9',
     'errorColor': '#ae2323',
+
     'notificationNoDetectionColor': '#A6A6A6',
-    'notificationFullyLabeledColor': '#7ECC92',
-    'notificationPartiallyLabeledColor': '#96B4D6',
+    'notificationFullyLabeledColor': '#66C978',
+    'notificationPartiallyLabeledColor': '#FFCB3B',
+
     'grayLightColor': '#e6e6e6',
     'grayMediumColor': '#d3d3d3',
     'grayDarkColor': '#808080',
 
     'locationMarkerPath': str(locationMarkerPath),
     'locationSplitMarkerPath': str(locationSplitMarkerPath),
-    'dropDownArrowPath': str(dropDownArrowPath),
-
-    'selectionColor': '#96D4A1', #BAD9C0', 88C292
-    'headerColor': '#ffb600'
+    'dropDownArrowPath': str(dropDownArrowPath)
 }
 
 

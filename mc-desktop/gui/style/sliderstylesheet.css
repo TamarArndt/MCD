@@ -24,13 +24,13 @@ QSlider::add-page {
     background: grayDarkColor;
 }
 QSlider::sub-page {
-    background-color: accentYellowColor;
+    background-color: #FBC02D;
 }
 
 
 QPushButton {
     color: white;
-    background-color: accentGreenColor;
+    background-color: #008000;
     border: none;
     padding: 8px;
     min-width: 30px;

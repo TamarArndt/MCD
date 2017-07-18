@@ -4,6 +4,7 @@ from gui.timelineview import notification, timelineentrylist, questionnaire
 
 class TimelineContent(QtWidgets.QWidget):
     loadingSignal = QtCore.pyqtSignal(bool)
+
     def __init__(self, appStatus, dbConnection, mapview):
         QtWidgets.QWidget.__init__(self)
 

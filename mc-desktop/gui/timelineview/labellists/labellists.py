@@ -12,6 +12,7 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
     def __init__(self, stopId, placeTypeLabel, isConfirmed, flagAutomaticLabeling,
                  dbConnection, appStatus, correspondingListItem, addressCommaSeparated):
         QtWidgets.QWidget.__init__(self)
+        self.correspondingListItem = correspondingListItem
         self.isConfirmed = isConfirmed
         self.address = addressCommaSeparated
         self.setProperty('isConfirmed', isConfirmed)
@@ -42,6 +43,8 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
                         icon = iconfactory.getStopLabelIcon(cluserAssociatedLabel)
                         self.combobox.insertItem(0, icon, cluserAssociatedLabel)
                         self.combobox.setItemData(0, getColorForConfidence(0.6), QtCore.Qt.BackgroundRole)
+                        #self.combobox.insertItem(0, 'label suggestion:')
+                        #self.combobox.setItemData(0, QtCore.QVariant(0), QtCore.Qt.UserRole-1)  # disable item
                     self.combobox.insertUnknownTop()
                     self.combobox.setCurrentText('Unknown')
 
@@ -53,6 +56,8 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
                         icon = iconfactory.getStopLabelIcon(label)
                         self.combobox.insertItem(0, icon, str(label))
                         self.combobox.setItemData(0, getColorForConfidence(confidence), QtCore.Qt.BackgroundRole)
+                    #self.combobox.insertItem(0, 'label suggestions:')
+                    #self.combobox.setItemData(0, QtCore.QVariant(0), QtCore.Qt.UserRole-1)  # disable item
                     self.combobox.insertUnknownTop()
                     self.combobox.setCurrentText('Unknown')
 
@@ -63,6 +68,8 @@ class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
                     icon = iconfactory.getStopLabelIcon(cluserAssociatedLabel)
                     self.combobox.insertItem(0, icon, cluserAssociatedLabel)
                     self.combobox.setItemData(0, getColorForConfidence(0.6), QtCore.Qt.BackgroundRole)
+                    #self.combobox.insertItem(0, 'label suggestion:')
+                    #self.combobox.setItemData(0, QtCore.QVariant(0), QtCore.Qt.UserRole-1)  # disable item
                 self.combobox.insertUnknownTop()
                 self.combobox.setCurrentText('Unknown')
 
@@ -326,6 +333,7 @@ class StopLabelWidget(QtWidgets.QWidget):
 class StopLabelList(QtWidgets.QComboBox):
     def __init__(self, correspondingListItem, isConfirmed):
         QtWidgets.QComboBox.__init__(self)
+        self.setObjectName('StopLabelList')
         self.isDroppedDown = False
         self.isConfirmed = isConfirmed
         self.setProperty('isConfirmed', isConfirmed)
@@ -441,6 +449,7 @@ class MovementLabelWidget(QtWidgets.QWidget):
 class MovementLabelList(QtWidgets.QComboBox):
     def __init__(self, travelMode, correspondingListItem, isConfirmed):
         QtWidgets.QComboBox.__init__(self)
+        self.setObjectName('MovementLabelList')
         self.isDroppedDown = False
         self.isConfirmed = isConfirmed
         self.setProperty('isConfirmed', isConfirmed)
@@ -448,9 +457,13 @@ class MovementLabelList(QtWidgets.QComboBox):
 
         for item in sorted(travelModesList.items()):
             label = item[1]
-            if not (isConfirmed and label == 'Unknown'):
+            if not label == 'Unknown': # (isConfirmed and ):
                 icon = iconfactory.getMovementLabelIcon(label)
                 self.addItem(icon, label)
+        if not isConfirmed:
+            self.insertSeparator(0)
+            icon = iconfactory.getStopLabelIcon('Unknown')
+            self.insertItem(0, icon, 'Unknown') # 'Unknown' at top as in stop lists for consistency
         self.setCurrentText(travelMode)  # is 'Unknown' if label not yet confirmed
 
     def focusInEvent(self, focusEvent):
@@ -540,6 +553,8 @@ travelModesList = {
     12: 'Detection is completely wrong',
     13: 'Unknown'
 }
+
+
 
 
 def getColorForConfidence(confidence):

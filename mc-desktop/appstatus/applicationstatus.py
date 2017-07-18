@@ -46,8 +46,8 @@ class ApplicationStatus():
         date = datetime.datetime.combine(date, datetime.datetime.min.time())
         next_date = date + datetime.timedelta(days=1)
 
-        fromTime = timehelper.cetdatetime_to_timestamp(date)
-        untilTime = timehelper.cetdatetime_to_timestamp(next_date)
+        fromTime = timehelper.utcdatetime_to_timestamp(date)
+        untilTime = timehelper.utcdatetime_to_timestamp(next_date)
 
         # STOPS
         stops_list = dbqueries.getStopsBetweenTime(dbConnection, fromTime, untilTime)

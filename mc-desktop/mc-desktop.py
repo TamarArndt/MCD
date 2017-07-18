@@ -77,8 +77,8 @@ if __name__ == '__main__':
         # --------------------------------------------------------------------------------
         # optional welcome window
         if usertestMode:
-            welcome = welcomewindow.WelcomeDialog(appStatus)
-            welcome.show()
+           welcome = welcomewindow.WelcomeDialog(appStatus)
+           welcome.show()
 
         mainWindow = mainwindow.MainWindow(appStatus, dbConnection)
         mainWindow.show()

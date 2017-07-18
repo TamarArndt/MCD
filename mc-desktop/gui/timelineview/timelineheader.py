@@ -49,6 +49,7 @@ class TimelineHeader(QtWidgets.QFrame):
 
 class DateLabel(QtWidgets.QLabel):
     speak = QtCore.pyqtSignal(QtCore.QDate)
+
     def __init__(self, appStatus):
         QtWidgets.QLabel.__init__(self)
 

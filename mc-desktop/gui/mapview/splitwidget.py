@@ -4,11 +4,17 @@ from helper import timehelper
 from database import dbupdates
 from gui.style import styleparser
 
+
 class SplitWidget(QtWidgets.QFrame):
-    def __init__(self, movementId):
+    def __init__(self, mapview, movementId, pathdictlistwithtime, appStatus, dbConnection):
         QtWidgets.QFrame.__init__(self)
         self.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Plain)
         self.setToolTip("Split this movement, if you want to specify different travel modes for parts of it.")
+        stylesheetFilename = 'sliderstylesheet.css'
+        processedstylesheetPath = styleparser.preprocessStylesheet(stylesheetFilename)
+        with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
+            processedstylesheet = file.read()
+            self.setStyleSheet(processedstylesheet)
 
         # properties needed in case of a split event
         self.currentTimestamp = None
@@ -25,16 +31,11 @@ class SplitWidget(QtWidgets.QFrame):
         gridlayout.setAlignment(self.splitTime, QtCore.Qt.AlignCenter)
         self.setLayout(gridlayout)
 
+        # splitButton setup
         self.splitButton.setEnabled(False)
+        self.splitButton.clicked.connect(lambda: mapview.splitSignal.emit(appStatus, dbConnection, movementId, self.currentTimestamp))
 
-        stylesheetFilename = 'sliderstylesheet.css'
-        processedstylesheetPath = styleparser.preprocessStylesheet(stylesheetFilename)
-        with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
-            processedstylesheet = file.read()
-            self.setStyleSheet(processedstylesheet)
-
-    def setUp(self, mapview, pathdictlistwithtime):
-        """ the slider is set up to represent the given path """
+        # splitSlider setup
         self.splitSlider.setMinimum(0)
         self.splitSlider.setMaximum(len(pathdictlistwithtime) - 1)
         self.splitSlider.setSingleStep(1)

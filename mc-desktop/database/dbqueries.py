@@ -133,13 +133,19 @@ def getMovementAttributesForMovementId(dbConnection, appStatus, movementId):
     duration_hours = duration_miliseconds / (3.6 * 10**6)
     duration = datetime.timedelta(milliseconds=duration_miliseconds)
     duration = duration - datetime.timedelta(microseconds=duration.microseconds)
+    fullhours = duration_miliseconds // (1000 * 60 * 60)
+    fullminutes = duration_miliseconds // (1000 * 60) - fullhours * 60
+    if fullhours == 0:
+        duration_formatted = str(fullminutes) + ' min'
+    else:
+        duration_formatted = str(fullhours) + ' h ' + str(fullminutes) + ' min'
 
     # velocity in km/h
     velocity = 0
     if duration_hours > 0:
         velocity = round(distance / duration_hours, 0)
 
-    return startTime, endTime, distance, duration, velocity
+    return startTime, endTime, distance, duration_formatted, velocity
 
 
 def getClusterIdFromStopId(dbConnection, stopId):

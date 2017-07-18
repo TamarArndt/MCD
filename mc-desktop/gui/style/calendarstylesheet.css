@@ -2,10 +2,11 @@
 
 CalendarView QWidget {
     background-color: grayLightColor;
+    color: lightgrey;
 }
 
 CalendarView QWidget#calendarNavBar {
-    background-color: headerColor;
+    background-color: primaryColor;
 }
 QCalendarWidget QToolButton {
     height: 25px;
@@ -13,7 +14,7 @@ QCalendarWidget QToolButton {
     font-weight: bold;
     font-size: 11.5pt;
     icon-size: 40px, 10px;
-    background-color: headerColor;
+    background-color: primaryColor;
 }
 
 QCalendarWidget QMenu {
@@ -36,5 +37,6 @@ QCalendarWidget QMenu:enabled {
 
 QCalendarWidget QAbstractItemView {
     selection-background-color: selectionColor;
+    selection-color: black;
 }
 

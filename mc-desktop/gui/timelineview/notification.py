@@ -11,6 +11,8 @@ class Notification(QtWidgets.QLabel):
         with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
             processedstylesheet = file.read()
             self.setStyleSheet(processedstylesheet)
+        size = QtWidgets.QLabel('x')
+        self.setFixedHeight(size.sizeHint().height() * 6)
 
         self.setProperty('status', 'noEntries')
         self.setContent(labelingStatusForCurrentDate)

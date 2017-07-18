@@ -9,6 +9,7 @@ from gui.style import iconfactory
 
 class Timeline(QtWidgets.QListWidget):
     numberOfLabeledEntriesChangedSignal = QtCore.pyqtSignal()
+    
     def __init__(self, appStatus, dbConnection, mapview):
         QtWidgets.QListWidget.__init__(self)
         self.setFocusPolicy(QtCore.Qt.NoFocus)
@@ -23,7 +24,7 @@ class Timeline(QtWidgets.QListWidget):
             # generate EntryWidget for each entry
             if entry['type'] == 'Stop':
                 entryWidget = StopEntry(entry, dbConnection, appStatus, listItem)
-                listItem.setBackground(QtGui.QColor(218, 222, 230))
+                listItem.setBackground(QtGui.QColor(220, 220, 220)) #218, 222, 230))
             elif entry['type'] == 'Movement':
                 entryWidget = MovementEntry(entry, dbConnection, appStatus, listItem)
                 listItem.setBackground(QtGui.QColor(245, 245, 245))
@@ -39,7 +40,8 @@ class Timeline(QtWidgets.QListWidget):
 
         # connections
         self.currentRowChanged.connect(self.setFocusToCorrespondingLabelList)
-        self.currentRowChanged.connect(lambda: mapview.showSelectedEntryOnMap(appStatus, self.currentItem().indexInEntryList))
+        self.currentRowChanged.connect(lambda: mapview.showSelectedEntryOnMap(appStatus, self.currentItem().indexInEntryList, False))
+        self.itemDoubleClicked.connect(lambda: mapview.showSelectedEntryOnMap(appStatus, self.currentItem().indexInEntryList, True))
 
     def setFocusToCorrespondingLabelList(self):
         logging.info(("selected entry: {}").format(self.currentItem().indexInEntryList))
@@ -101,8 +103,9 @@ class StopEntry(Entry):
         value = stopentry['value']
         time = EntryTime(value.startTime, value.endTime)
 
-        stopicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_mvmt1.svg'))
+        stopicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_mvmt.svg'))
         stopcircle = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_stop.svg'), parent=stopicon)
+        stopcircle.move(0,5)
 
         addressCommaSeparated = dbqueries.getClusterNameForId(dbConnection, value.idCluster)
         address = addressCommaSeparated.split(', ')
@@ -135,7 +138,7 @@ class MovementEntry(Entry):
         startTime, endTime, distance, duration, velocity = dbqueries.getMovementAttributesForMovementId(dbConnection, appStatus, value.id)
 
         time = QtWidgets.QWidget()
-        movementicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_mvmt1.svg'))
+        movementicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_mvmt.svg'))
 
         info = MvmtAttributes(distance, duration, velocity)
         movementId = value.id
@@ -148,6 +151,7 @@ class MovementEntry(Entry):
                                             movementicon,
                                             info, labelwidget,
                                             'Movement')
+
 
 
 class MvmtAttributes(QtWidgets.QWidget):
@@ -204,6 +208,9 @@ class AutomaticLabelingQuestion(QtWidgets.QFrame):
         self.setObjectName('automaticLabelingQuestion')
         self.setToolTip("If you don't want to be asked this question again, disable automatic labeling in the settings menu.")
 
+        indicator = QtWidgets.QFrame()
+        indicator.setStyleSheet('QFrame {background-color: #507EB1;}')
+        indicator.setFixedWidth(10)
         question = QtWidgets.QLabel('Apply label "' + str(selectedLabel) + '" to all other unlabeled stops at this location?')
         question.setWordWrap(True)
         question.setObjectName('importantLabel')
@@ -217,13 +224,17 @@ class AutomaticLabelingQuestion(QtWidgets.QFrame):
         yesbutton.clicked.connect(lambda: self.accept(dbConnection, stopId, selectedLabel))
 
         hlayout = QtWidgets.QHBoxLayout()
-        hlayout.addSpacing(2)
+        hlayout.setContentsMargins(10, 10, 10, 10)
         hlayout.addWidget(question)
         hlayout.addWidget(nobutton)
         hlayout.addSpacing(2)
         hlayout.addWidget(yesbutton)
-        hlayout.addSpacing(2)
-        self.setLayout(hlayout)
+
+        decorationlayout = QtWidgets.QHBoxLayout()
+        decorationlayout.setContentsMargins(0, 0, 0, 0)
+        decorationlayout.addWidget(indicator)
+        decorationlayout.addLayout(hlayout)
+        self.setLayout(decorationlayout)
 
     def accept(self, dbConnection, stopId, selectedLabel):
         dbupdates.newClusterPlaceTypeAssociation(dbConnection, stopId, selectedLabel)

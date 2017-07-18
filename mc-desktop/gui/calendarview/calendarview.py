@@ -75,7 +75,7 @@ class MyCalendar(QtWidgets.QCalendarWidget):
         # style colors for database range: enabled range
         rangeformat = QtGui.QTextCharFormat()
         rangeformat.setBackground(QtCore.Qt.white)
-        mycolor = QtGui.QColor.fromRgb(25, 118, 210) #primaryDarkColor
+        mycolor = QtGui.QColor.fromRgb(80, 80, 80) #darkgray
         rangeformat.setForeground(mycolor)
         otherformat = QtGui.QTextCharFormat()
         otherformat.setForeground(QtCore.Qt.lightGray)

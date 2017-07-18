@@ -27,12 +27,6 @@ Rectangle {
         }
     }
 
-// osm plugin *sometimes* not working
-// with error message: QGeoTileRequestManager: Failed to fetch tile (1009,639,10) 5 times, giving up. Last error message was: 'Host otile1.mqcdn.com not found'
-//    Plugin {
-//        id: osmPlugin
-//        name: "osm"
-//    }
 
     Plugin {
         id: mapboxPlugin
@@ -64,7 +58,7 @@ Rectangle {
             delegate: MapQuickItem {
                 anchorPoint.x: locationmarker.width/2
                 anchorPoint.y: locationmarker.height/2
-                coordinate: QtPositioning.coordinate(latitude, longitude) // uses lat and long from List Model
+                coordinate: QtPositioning.coordinate(latitude, longitude) // uses lat, long from List Model
 
                 sourceItem: Image {
                     id: locationmarker

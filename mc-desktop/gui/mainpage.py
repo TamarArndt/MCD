@@ -1,28 +1,19 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from gui.calendarview import calendarview
 from gui.timelineview import timelineview, waitingspinnerwidget
-from gui.mapview import mapview, mapwidget
+from gui.mapview import mapview2
 from database import dbupdates
+from database.dbconnection import DatabaseConnection
+from appstatus.applicationstatus import ApplicationStatus
 
 
 class MainPage(QtWidgets.QWidget):
     def __init__(self, appStatus, dbConnection):
         super(MainPage, self).__init__()
 
-        # TODO where does MapWidget Sigsegv come from?
-        # x = QtWidgets.QWidget()
-        # lay = QtWidgets.QVBoxLayout()
-        # lay.setContentsMargins(0, 0, 0, 0)
-        # lay.setSpacing(0)
-        # lay.addWidget(mapwidget.MapWidget(), 1)
-        # x.setLayout(lay)
-        # #self.map_view = mapwidget.MapWidget()
-        # #self.map_view = x
-
-
         # components of MainPage
         self.calendar_view = calendarview.CalendarView(appStatus)
-        self.map_view = mapview.MapView(appStatus, dbConnection)
+        self.map_view = mapview2.MapView(appStatus, dbConnection)
         self.timeline_view = timelineview.TimelineView(appStatus, dbConnection, self.map_view)
 
         splitter = QtWidgets.QSplitter()
@@ -40,7 +31,7 @@ class MainPage(QtWidgets.QWidget):
         # Manage connections between components:
         # - communicate datechange between calendar, timelineHeader, mapview and appStatus object
         self.communicateDateChange(appStatus, dbConnection)
-        self.map_view.splitSignal.connect(lambda: self.actionsInCaseOfSplitEvent(appStatus, dbConnection))
+        self.map_view.splitSignal[ApplicationStatus, DatabaseConnection, int, int].connect(self.actionsInCaseOfSplitEvent)
 
     def communicateDateChange(self, appStatus, dbConnection):
         calendarinstance = self.calendar_view.calendar
@@ -61,9 +52,9 @@ class MainPage(QtWidgets.QWidget):
         timelineheaderinstance.dateLabel.speak[QtCore.QDate].connect(lambda: mapviewinstance.showRouteOfCurrentDateOnMap(appStatus))
 
 
-    def actionsInCaseOfSplitEvent(self, appStatus, dbConnection):
+    def actionsInCaseOfSplitEvent(self, appStatus, dbConnection, movementId, splittime):
         row = self.timeline_view.timelineContent.timeline.currentRow()
-        dbupdates.splitMovementAtTime(dbConnection, movementId=self.map_view.split.movementId, splittime=self.map_view.split.currentTimestamp)
+        dbupdates.splitMovementAtTime(dbConnection, movementId=movementId, splittime=splittime)
 
         appStatus.updateApplicationStatus(dbConnection)
         self.timeline_view.timelineContent.updateTimelineContent(appStatus, dbConnection, self.map_view)

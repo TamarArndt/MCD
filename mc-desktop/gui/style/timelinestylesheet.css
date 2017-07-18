@@ -5,13 +5,14 @@ TimelineView QLabel {
 
 
 TimelineView TimelineHeader {
-    background-color: headerColor;
+    background-color: primaryColor;
     padding: 15px;
 }
 
 TimelineView TimelineHeader QLabel {
     font-size: 14pt;
-    /*font-weight: bold;*/
+    color: white;
+    font-weight: bold;
 }
 
 TimelineView QToolButton {
@@ -79,24 +80,35 @@ StopLabelWidget[isConfirmed='false'] QLabel{
 
 
 QComboBox[isConfirmed='true'] {
-    background-color: #C5D0D4; /*#B6C6CC; /* #8CCF76;*/
-    border-radius: 4px;
+    background-color: confirmedColor; /*#C5D0D4; /*#B6C6CC; /* #8CCF76;*/
+    border-radius: 3px;
 }
 QComboBox[isConfirmed='false'] {
-    background-color: #3C63E6;
+    background-color: notConfirmedColor;
+    border-radius: 3px;
 }
 QComboBox[isConfirmed='true']:hover:focus {
-    background-color: #88BDCF;
+    background-color: #B7BABD;
+    border-radius: 3px;
 }
 QComboBox[isConfirmed='false']:hover:focus {
-    background-color: #0834C4;
+    background-color: #4B78AB;
+    border-radius: 3px;
 }
+
+/*
+#MovementLabelList {
+    border-left: 3px solid orange;
+}
+#StopLabelList {
+    border-left: 3px solid blue;
+}*/
 
 
 QComboBox {
     /*border: 2px solid #D4D4D4;*/
     border: none;
-    font-size: 11pt;
+    font-size: 11.5pt;
     padding: 5px;
     color: black;
     selection-background-color: grayMediumColor;
@@ -107,26 +119,11 @@ QComboBox::drop-down {
     image: url(dropDownArrowPath);
 }
 
-QComboBox QAbstractItemView::item {
-    height: 15px;
-    padding-top: 0px;
-    margin-top: 10px;
+
+
+QComboBox:item:disabled {
+    color: grey;
 }
-
-/*
-QComboBox:on { /* selected item when list elapsed
-    color: #ae2323;
-    selection-color: green;
-    /*background-color: #ae2323;*/
-    /*selection-background-color: #ffaa00;*/
-/*} */
-/*
-QComboBox:off {
-    selection-background-color: #ffaa00;
-    background-color: red; /* this makes the separator and icons red !
-}*/
-
-/* ausgeklappte liste */
 
 /*
 QComboBox QAbstractItemView::item {
@@ -138,18 +135,3 @@ QAbstractItemView::item {
     min-height: 50px;
 }
 */
-
-/* ausgeklappte liste
-QComboBox QListView::item {
-    padding: 5px;
-    margin: 10px;
-}*/
-
-/*
-QComboBox QAbstractItemDelegate {
-    background-color: red;
-}*/
-/*
-QComboBox:hover {
-    background-color: #FBC02D;
-}*/
