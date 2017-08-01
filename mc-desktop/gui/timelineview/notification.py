@@ -1,16 +1,14 @@
-import os, sys
 from PyQt5 import QtCore, QtWidgets
 from gui.style import styleparser
+
 
 class Notification(QtWidgets.QLabel):
     def __init__(self, labelingStatusForCurrentDate):
         QtWidgets.QLabel.__init__(self)
         self.setAlignment(QtCore.Qt.AlignCenter)
         stylesheetFilename = 'notificationstylesheet.css'
-        processedstylesheetPath = styleparser.preprocessStylesheet(stylesheetFilename)
-        with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
-            processedstylesheet = file.read()
-            self.setStyleSheet(processedstylesheet)
+        styleparser.StylesheetParser().setProcessedStyleSheet(stylesheetFilename, self)
+
         size = QtWidgets.QLabel('x')
         self.setFixedHeight(size.sizeHint().height() * 6)
 

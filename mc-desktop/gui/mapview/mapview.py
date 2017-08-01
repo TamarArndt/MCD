@@ -1,20 +1,25 @@
 import os
-from PyQt5 import QtCore, QtGui, QtWidgets, QtQuickWidgets
+from PyQt5 import QtCore, QtWidgets, QtQuickWidgets
 from gui.mapview import splitwidget
 from database import dbqueries
 from appstatus.applicationstatus import ApplicationStatus
 from database.dbconnection import DatabaseConnection
+from helper.filehelper import FileHelper
 
 
 class MapView(QtWidgets.QWidget):
-    splitSignal = QtCore.pyqtSignal(ApplicationStatus, DatabaseConnection, int, int) # int,int: id of selected Movement and timestamp to split at
+    splitSignal = QtCore.pyqtSignal(ApplicationStatus, DatabaseConnection, int, str)
+    # int, str: id of selected Movement and timestamp to split at (too large for int)
 
-    def __init__(self, appStatus, dbConnection):
+    def __init__(self, appStatus, dbConnection, alwaysShowEntirePath):
         QtWidgets.QWidget.__init__(self)
+        PROJECT_DIR = FileHelper().get_project_cwd()
+        self.alwaysShowEntirePath = alwaysShowEntirePath
         self.dbConnection = dbConnection
 
         self.mapspace = QtQuickWidgets.QQuickWidget()
-        self.mapspace.setSource(QtCore.QUrl(os.path.join(os.path.dirname(__file__) , 'mymap.qml')))
+        self.mapspace.rootContext().setContextProperty("projectDirectory", PROJECT_DIR)
+        self.mapspace.setSource(QtCore.QUrl(os.path.join(PROJECT_DIR, 'gui', 'mapview', 'mymap.qml')))
         self.mapspace.setResizeMode(QtQuickWidgets.QQuickWidget.SizeRootObjectToView)
 
         # placeholder for splitwidget to refer to when hiding
@@ -35,6 +40,7 @@ class MapView(QtWidgets.QWidget):
 
         # on startup show dayroute for initally selected date
         self.showRouteOfCurrentDateOnMap(appStatus)
+        self.mapspace.rootObject().fitMap()
 
     def showRouteOfCurrentDateOnMap(self, appStatus):
         """ shows all paths of the current date as one long route of the day """
@@ -49,21 +55,25 @@ class MapView(QtWidgets.QWidget):
         for entry in currentDateEntries:
             if entry['type'] == 'Stop':
                 clusterId = entry['value'].idCluster
-                geom = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
+                geom = dbqueries.getClusterForId(clusterId)
                 markersdictlist.append({'longitude': geom['coordinates'][0], 'latitude': geom['coordinates'][1]})
             if entry['type'] == 'Movement':
                 id = entry['value'].id
-                subpath = dbqueries.getMovementPathForMovementId(self.dbConnection, appStatus, id)
+                subpath = dbqueries.getMovementPathForMovementId(self.dbConnection, id)
                 for point in subpath:
                     geom = point['geom']
                     pathdictlist.append({'longitude': geom['coordinates'][0], 'latitude': geom['coordinates'][1]})
 
         self.mapspace.rootObject().clearAll()
-        self.mapspace.rootObject().setPath(pathdictlist)
-        self.mapspace.rootObject().setMarkers(markersdictlist)
+        if self.alwaysShowEntirePath:
+            self.mapspace.rootObject().setPathEntireDay(pathdictlist)
+            self.mapspace.rootObject().setMarkersEntireDay(markersdictlist)
+        else:
+            self.mapspace.rootObject().setPathSelectedEntry(pathdictlist)
+            self.mapspace.rootObject().setMarkersSelectedEntry(markersdictlist)
         self.mapspace.rootObject().fitMap()
 
-    def showSelectedEntryOnMap(self, appStatus, entryIndex):
+    def showSelectedEntryOnMap(self, appStatus, entryIndex, isDoubleClicked):
         """ shows the currently selected entry of timeline on the map """
         currentDateEntry = appStatus.currentDateEntries[entryIndex]
         pathdictlist = []
@@ -72,13 +82,13 @@ class MapView(QtWidgets.QWidget):
         if currentDateEntry['type'] == 'Stop':
             self.split.setHidden(True)
             clusterId = currentDateEntry['value'].idCluster
-            geom = dbqueries.getClusterForId(self.dbConnection, appStatus, clusterId)
+            geom = dbqueries.getClusterForId(clusterId)
             markersdictlist.append({'longitude': geom['coordinates'][0], 'latitude': geom['coordinates'][1]})
 
         elif currentDateEntry['type'] == 'Movement':
             pathdictlistwithtime = []
             movementId = currentDateEntry['value'].id
-            path = dbqueries.getMovementPathForMovementId(self.dbConnection, appStatus, movementId)
+            path = dbqueries.getMovementPathForMovementId(self.dbConnection, movementId)
             for point in path:
                 geom = point['geom']
                 dictpoint = {'longitude': geom['coordinates'][0], 'latitude': geom['coordinates'][1]}
@@ -88,14 +98,26 @@ class MapView(QtWidgets.QWidget):
             markersdictlist.append(pathdictlist[0])
             markersdictlist.append(pathdictlist[-1])  # place a marker at beginning and end
 
-            if not appStatus.usertestMode:
-                self.renewSplitWidget(movementId, pathdictlistwithtime, appStatus)
-                self.split.setHidden(False)
+            self.renewSplitWidget(movementId, pathdictlistwithtime, appStatus)
+            self.split.setHidden(False)
 
-        self.mapspace.rootObject().clearAll()
-        self.mapspace.rootObject().setPath(pathdictlist)
-        self.mapspace.rootObject().setMarkers(markersdictlist)
+        if self.alwaysShowEntirePath:
+            # don't clear all but only the colored/selectedEntry path and markers
+            self.mapspace.rootObject().clearOnlyPathAndMarkersOfSelectedEntry()
+            self.mapspace.rootObject().setPathSelectedEntry(pathdictlist)
+            self.mapspace.rootObject().setMarkersSelectedEntry(markersdictlist)
+        else:
+            self.mapspace.rootObject().clearAll()
+            self.mapspace.rootObject().setPathSelectedEntry(pathdictlist)
+            self.mapspace.rootObject().setMarkersSelectedEntry(markersdictlist)
         self.mapspace.rootObject().fitMap()
+
+        if isDoubleClicked:
+            if len(markersdictlist) > 0:
+                self.mapspace.rootObject().fitMapToSelectedItems(markersdictlist[0]['latitude'],
+                                                                 markersdictlist[0]['longitude'],
+                                                                 markersdictlist[-1]['latitude'],
+                                                                 markersdictlist[-1]['longitude'])
 
     def showSplitMarker(self, dictpoint):
         self.mapspace.rootObject().setSplitMarker(dictpoint)

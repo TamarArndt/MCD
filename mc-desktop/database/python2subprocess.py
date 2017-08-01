@@ -12,10 +12,11 @@ if sys.argv[3] == 'True':
 
     # for json-list type output
     first=True
+    out_str='['
     for row in result:
         if first:
             first=False
-            out_str = '['+row[0]
+            out_str = out_str+row[0]
         else:
             out_str = out_str+','+row[0]
     out_str = out_str+']'

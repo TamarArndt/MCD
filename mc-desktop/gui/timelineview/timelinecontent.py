@@ -11,10 +11,9 @@ class TimelineContent(QtWidgets.QWidget):
         # components
         self.notification = notification.Notification(appStatus.labelingStatusForCurrentDate)
         self.timeline = timelineentrylist.Timeline(appStatus, dbConnection, mapview)
-        self.questionnaire = questionnaire.Questionnaire()
+        self.questionnaire = questionnaire.Questionnaire(appStatus, dbConnection)
 
-        # TODO : when questionnaire is implemented: check if it doesn't show in the second case anyway
-        if appStatus.usertestMode or appStatus.labelingStatusForCurrentDate.totalNumberOfStops == 0:
+        if appStatus.labelingStatusForCurrentDate.totalNumberOfStops == 0:
             self.questionnaire.setHidden(True)
 
         self.layout = QtWidgets.QVBoxLayout()
@@ -27,23 +26,23 @@ class TimelineContent(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
         self.timeline.numberOfLabeledEntriesChangedSignal.connect(lambda: self.updateNotification(appStatus))
+        self.timeline.updateNecessary.connect(lambda: self.reevaluateTimelineContent(appStatus, dbConnection, mapview))
 
     def updateTimelineContent(self, appStatus, dbConnection, mapview):
-        self.loadingSignal.emit(True)
+        #self.loadingSignal.emit(True)
         # update components
         self.updateNotification(appStatus)
         newtimeline = timelineentrylist.Timeline(appStatus, dbConnection, mapview)
-        newquestionnaire = questionnaire.Questionnaire()
+        newquestionnaire = questionnaire.Questionnaire(appStatus, dbConnection)
 
         self.updateTimeline(newtimeline)
         self.updateQuestionnaire(newquestionnaire)
 
-        # TODO : when questionnaire is implemented: check if it doesn't show in the second case anyway
-        if appStatus.usertestMode or appStatus.labelingStatusForCurrentDate.totalNumberOfStops == 0:
+        if appStatus.labelingStatusForCurrentDate.totalNumberOfStops == 0:
             self.questionnaire.setHidden(True)
 
         self.timeline.numberOfLabeledEntriesChangedSignal.connect(lambda: self.updateNotification(appStatus))
-        self.loadingSignal.emit(False)
+        #self.loadingSignal.emit(False)
 
 
     def updateNotification(self, appStatus):
@@ -61,5 +60,12 @@ class TimelineContent(QtWidgets.QWidget):
         self.questionnaire.setParent(None)
         self.questionnaire = newquestionnaire
         self.layout.insertWidget(2, self.questionnaire, 1)
+
+    def reevaluateTimelineContent(self, appStatus, dbConnection, mapview):
+        row = self.timeline.currentRow()
+        appStatus.updateApplicationStatus(dbConnection)
+        self.updateTimelineContent(appStatus, dbConnection, mapview)
+        self.timeline.setCurrentRow(row)
+
 
 

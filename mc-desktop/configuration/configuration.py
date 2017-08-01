@@ -1,6 +1,7 @@
 import sys
 import os
 import configparser
+from helper.filehelper import FileHelper
 
 
 def accessConfig():
@@ -15,11 +16,10 @@ def accessConfig():
     except KeyError:
         # create configuration.ini with default values
         myConfigParser = configparser.ConfigParser()
-        # TODO MAIN_DIR not working on windows
-        MAIN_DIR = os.path.dirname(sys.modules['__main__'].__file__)
-        myConfigParser['paths'] = {'dbpath': os.path.join(MAIN_DIR, 'assets', 'database', 'data.db'),
-                                   'jarpath': os.path.join(MAIN_DIR, 'assets', 'spl-wrapper', 'semanticlabler-1.0-SNAPSHOT-jar-with-dependencies.jar'),
-                                   'modelpath': os.path.join(MAIN_DIR, 'assets', 'spl-wrapper', 'random_comittee.model')}
+        PROJECT_DIR = FileHelper().get_project_cwd()
+        myConfigParser['paths'] = {'dbpath': os.path.join(PROJECT_DIR, 'assets', 'database', 'data.db'),
+                                   'jarpath': os.path.join(PROJECT_DIR, 'assets', 'spl-wrapper', 'semanticlabler-1.0-SNAPSHOT-jar-with-dependencies.jar'),
+                                   'modelpath': os.path.join(PROJECT_DIR, 'assets', 'spl-wrapper', 'random_comittee.model')}
 
         with open(os.path.join(configDirPath, 'configuration.ini'), 'w') as configfile:
             myConfigParser.write(configfile)

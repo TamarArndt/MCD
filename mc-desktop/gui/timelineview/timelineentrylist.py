@@ -5,17 +5,19 @@ from gui.timelineview.labellists import labellists
 from database import dbqueries, dbupdates
 from helper import timehelper
 from gui.style import iconfactory
-
+from helper.filehelper import FileHelper
 
 class Timeline(QtWidgets.QListWidget):
     numberOfLabeledEntriesChangedSignal = QtCore.pyqtSignal()
+    updateNecessary = QtCore.pyqtSignal()
     
     def __init__(self, appStatus, dbConnection, mapview):
         QtWidgets.QListWidget.__init__(self)
-        self.setFocusPolicy(QtCore.Qt.NoFocus)
+        #self.setFocusPolicy(QtCore.Qt.NoFocus)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setFrameStyle(QtWidgets.QFrame.NoFrame)
         self.listHeight = 0
+        widths = [0]
 
         entryList = appStatus.currentDateEntries
         for index, entry in enumerate(entryList):
@@ -35,8 +37,11 @@ class Timeline(QtWidgets.QListWidget):
             self.addItem(listItem)
             self.setItemWidget(listItem, entryWidget)
             self.listHeight += listItem.sizeHint().height()
+            widths.append(listItem.sizeHint().width())
 
+        self.widthHint = max(widths)
         self.setFixedHeight(self.listHeight)
+
 
         # connections
         self.currentRowChanged.connect(self.setFocusToCorrespondingLabelList)
@@ -44,26 +49,29 @@ class Timeline(QtWidgets.QListWidget):
         self.itemDoubleClicked.connect(lambda: mapview.showSelectedEntryOnMap(appStatus, self.currentItem().indexInEntryList, True))
 
     def setFocusToCorrespondingLabelList(self):
-        logging.info(("selected entry: {}").format(self.currentItem().indexInEntryList))
+        #logging.info(("selected entry: {}").format(self.currentItem().indexInEntryList))
         correspondingLabelList = self.currentItem().entryWidget.labelwidget.combobox
         correspondingLabelList.setFocus()
 
     def insertAutoLabelQuestion(self, index, dbConnection, stopId, selectedLabel):
-        autoLabelQuestion = AutomaticLabelingQuestion(dbConnection, stopId, selectedLabel)
-        listItem = QtWidgets.QListWidgetItem()
-        listItem.setFlags(listItem.flags() & ~QtCore.Qt.ItemIsSelectable & ~QtCore.Qt.ItemIsEnabled)
-        listItem.setSizeHint(autoLabelQuestion.sizeHint())
-        self.insertItem(index, listItem)
-        self.setItemWidget(listItem, autoLabelQuestion)
-        self.listHeight += listItem.sizeHint().height()
+        if type(self.item(index)) == AutomaticLabelingQuestionListWidgetItem:
+            self.removeAutoLabelQuestion(self.item(index), index)
+        autoLabelQuestionItem = AutomaticLabelingQuestionListWidgetItem(dbConnection, stopId, selectedLabel)
+        autoLabelQuestion = autoLabelQuestionItem.autoLabelQuestion
+        self.insertItem(index, autoLabelQuestionItem)
+        self.setItemWidget(autoLabelQuestionItem, autoLabelQuestion)
+        self.listHeight += autoLabelQuestionItem.sizeHint().height()
         self.setFixedHeight(self.listHeight)
-        autoLabelQuestion.finished.connect(lambda: self.removeAutoLabelQuestion(listItem, index))
+        autoLabelQuestion.accepted.connect(lambda: self.removeAutoLabelQuestion(autoLabelQuestionItem, index, True))
+        autoLabelQuestion.rejected.connect(lambda: self.removeAutoLabelQuestion(autoLabelQuestionItem, index, False))
 
-    def removeAutoLabelQuestion(self, listItem, index):
+    def removeAutoLabelQuestion(self, listItem, index, updateNecessary):
         self.listHeight -= listItem.sizeHint().height()
         self.removeItemWidget(listItem)
         self.takeItem(index)
         self.setFixedHeight(self.listHeight)
+        if updateNecessary:
+            self.updateNecessary.emit()
 
 
 class MyListWidgetItem(QtWidgets.QListWidgetItem):
@@ -71,6 +79,13 @@ class MyListWidgetItem(QtWidgets.QListWidgetItem):
         QtWidgets.QListWidgetItem.__init__(self)
         self.entryWidget = None
         self.indexInEntryList = None
+
+class AutomaticLabelingQuestionListWidgetItem(QtWidgets.QListWidgetItem):
+    def __init__(self, dbConnection, stopId, selectedLabel):
+        QtWidgets.QListWidgetItem.__init__(self)
+        self.autoLabelQuestion = AutomaticLabelingQuestion(dbConnection, stopId, selectedLabel)
+        self.setFlags(self.flags() & ~QtCore.Qt.ItemIsSelectable & ~QtCore.Qt.ItemIsEnabled)
+        self.setSizeHint(self.autoLabelQuestion.sizeHint())
 
 
 class Entry(QtWidgets.QFrame):
@@ -102,9 +117,10 @@ class StopEntry(Entry):
     def __init__(self, stopentry, dbConnection, appStatus, correspondingListItem):
         value = stopentry['value']
         time = EntryTime(value.startTime, value.endTime)
+        PROJECT_DIR = FileHelper().get_project_cwd()
 
-        stopicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_mvmt.svg'))
-        stopcircle = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_stop.svg'), parent=stopicon)
+        stopicon = QtSvg.QSvgWidget(os.path.join(PROJECT_DIR, 'res', 'icon_mvmt.svg'))
+        stopcircle = QtSvg.QSvgWidget(os.path.join(PROJECT_DIR, 'res', 'icon_stop.svg'), parent=stopicon)
         stopcircle.move(0,5)
 
         addressCommaSeparated = dbqueries.getClusterNameForId(dbConnection, value.idCluster)
@@ -114,17 +130,11 @@ class StopEntry(Entry):
         info.setWordWrap(True)
 
         isConfirmed = value.flagAutomaticLabeling == 2 or value.flagAutomaticLabeling == 3
-        if appStatus.usertestMode:
-            labelwidget = labellists.StopLabelWidgetUsertestMode(value.id, value.placeTypeLabel,
-                                                                 isConfirmed, value.flagAutomaticLabeling,
-                                                                 dbConnection, appStatus,
-                                                                 correspondingListItem, addressCommaSeparated)
 
-        else:
-            labelwidget = labellists.StopLabelWidget(value.id, value.placeTypeLabel,
-                                                     isConfirmed, value.flagAutomaticLabeling,
-                                                     dbConnection, appStatus,
-                                                     correspondingListItem, addressCommaSeparated)
+        labelwidget = labellists.StopLabelWidget(value.id, value.placeTypeLabel,
+                                                 isConfirmed, value.flagAutomaticLabeling,
+                                                 dbConnection, appStatus,
+                                                 correspondingListItem, addressCommaSeparated)
 
         super(StopEntry, self).__init__(time,
                                         stopicon,
@@ -134,11 +144,12 @@ class StopEntry(Entry):
 
 class MovementEntry(Entry):
     def __init__(self, movemententry, dbConnection, appStatus, correspondingListItem):
+        PROJECT_DIR = FileHelper().get_project_cwd()
         value = movemententry['value']
         startTime, endTime, distance, duration, velocity = dbqueries.getMovementAttributesForMovementId(dbConnection, appStatus, value.id)
 
         time = QtWidgets.QWidget()
-        movementicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'icon_mvmt.svg'))
+        movementicon = QtSvg.QSvgWidget(os.path.join(PROJECT_DIR, 'res', 'icon_mvmt.svg'))
 
         info = MvmtAttributes(distance, duration, velocity)
         movementId = value.id
@@ -151,8 +162,10 @@ class MovementEntry(Entry):
                                             movementicon,
                                             info, labelwidget,
                                             'Movement')
-
-
+# TODO
+class ShortStopEntry(Entry):
+    def __init__(self, shortstopentry, dbConnection, appStatus, correspondingListItem):
+        pass
 
 class MvmtAttributes(QtWidgets.QWidget):
     def __init__(self, distance, duration, velocity):
@@ -202,7 +215,9 @@ class EntryTime(QtWidgets.QWidget):
 # ------------------------------------------------------------------------------------------------------------------
 
 class AutomaticLabelingQuestion(QtWidgets.QFrame):
-    finished = QtCore.pyqtSignal()
+    #finished = QtCore.pyqtSignal()
+    accepted = QtCore.pyqtSignal()
+    rejected = QtCore.pyqtSignal()
     def __init__(self, dbConnection, stopId, selectedLabel):
         QtWidgets.QFrame.__init__(self)
         self.setObjectName('automaticLabelingQuestion')
@@ -217,7 +232,7 @@ class AutomaticLabelingQuestion(QtWidgets.QFrame):
         nobutton = QtWidgets.QPushButton('No')
         nobutton.setObjectName('smallButton')
         nobutton.setFixedWidth(nobutton.sizeHint().width())
-        nobutton.clicked.connect(lambda: self.finished.emit())
+        nobutton.clicked.connect(lambda: self.rejected.emit())
         yesbutton = QtWidgets.QPushButton('Yes')
         yesbutton.setObjectName('smallButton')
         yesbutton.setFixedWidth(yesbutton.sizeHint().width())
@@ -238,4 +253,5 @@ class AutomaticLabelingQuestion(QtWidgets.QFrame):
 
     def accept(self, dbConnection, stopId, selectedLabel):
         dbupdates.newClusterPlaceTypeAssociation(dbConnection, stopId, selectedLabel)
-        self.finished.emit()
+
+        self.accepted.emit()

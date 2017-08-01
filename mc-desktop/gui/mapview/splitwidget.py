@@ -1,5 +1,5 @@
 import os, sys
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 from helper import timehelper
 from database import dbupdates
 from gui.style import styleparser
@@ -11,10 +11,7 @@ class SplitWidget(QtWidgets.QFrame):
         self.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Plain)
         self.setToolTip("Split this movement, if you want to specify different travel modes for parts of it.")
         stylesheetFilename = 'sliderstylesheet.css'
-        processedstylesheetPath = styleparser.preprocessStylesheet(stylesheetFilename)
-        with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
-            processedstylesheet = file.read()
-            self.setStyleSheet(processedstylesheet)
+        styleparser.StylesheetParser().setProcessedStyleSheet(stylesheetFilename, self)
 
         # properties needed in case of a split event
         self.currentTimestamp = None
@@ -33,7 +30,7 @@ class SplitWidget(QtWidgets.QFrame):
 
         # splitButton setup
         self.splitButton.setEnabled(False)
-        self.splitButton.clicked.connect(lambda: mapview.splitSignal.emit(appStatus, dbConnection, movementId, self.currentTimestamp))
+        self.splitButton.clicked.connect(lambda: mapview.splitSignal.emit(appStatus, dbConnection, movementId, str(self.currentTimestamp))) # self.currentTimestamp))
 
         # splitSlider setup
         self.splitSlider.setMinimum(0)
@@ -56,3 +53,9 @@ class SplitWidget(QtWidgets.QFrame):
     def manageEnabelingOfSplitButton(self, sliderValue):
         bool = self.splitSlider.minimum() < sliderValue < self.splitSlider.maximum()
         self.splitButton.setEnabled(bool)
+
+
+class StupidIntClass(QtWidgets.QWidget):
+    def __init__(self, int):
+        QtWidgets.QWidget.__init__(self)
+        self.largeInt = int

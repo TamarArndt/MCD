@@ -30,7 +30,7 @@ QSlider::sub-page {
 
 QPushButton {
     color: white;
-    background-color: #008000;
+    background-color: #399b2c;
     border: none;
     padding: 8px;
     min-width: 30px;
@@ -39,4 +39,4 @@ QPushButton {
 }
 
 QPushButton:disabled{ background-color: grayDarkColor; }
-QPushButton:focus:pressed{ background-color: lightgreen; }
+QPushButton:focus:pressed{ background-color: grayMediumColor; }

@@ -1,5 +1,6 @@
 import os, sys
 from PyQt5 import QtGui, QtWidgets
+from helper.filehelper import FileHelper
 
 
 class ShortcutWindow(QtWidgets.QDialog):
@@ -9,7 +10,8 @@ class ShortcutWindow(QtWidgets.QDialog):
 
         # window settings
         self.setWindowTitle("Shortcuts")
-        self.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'mc-logo.svg')))
+        PROJECT_DIR = FileHelper().get_project_cwd()
+        self.setWindowIcon(QtGui.QIcon(os.path.join(PROJECT_DIR, 'res', 'mc-logo.svg')))
         self.setFixedHeight(400)
         self.setFixedWidth(400)
 

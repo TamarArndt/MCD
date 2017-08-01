@@ -3,7 +3,7 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSvg
 from database import dbconnection
 from configuration import configuration
-
+from helper.filehelper import FileHelper
 
 class DatabasePathConfig(QtWidgets.QDialog):
     def __init__(self, db_path_default):
@@ -13,12 +13,13 @@ class DatabasePathConfig(QtWidgets.QDialog):
         QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+W"), self, self.reject)
 
         self.setWindowTitle("Database path configuration")
-        self.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'mc-logo.svg')))
+        PROJECT_DIR = FileHelper().get_project_cwd()
+        self.setWindowIcon(QtGui.QIcon(os.path.join(PROJECT_DIR, 'res', 'mc-logo.svg')))
         self.setModal(True)
         self.setMaximumHeight(300)
 
         # ------------------------------------------------------------
-        dbicon = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'database.svg'))
+        dbicon = QtSvg.QSvgWidget(os.path.join(PROJECT_DIR, 'res', 'database.svg'))
         dbicon.setFixedSize(40, 40)
         #database.svg: <Madebyoliver> http://www.flaticon.com, licensed by Creative Commons BY 3.0
         text = QtWidgets.QLabel("<p> Please specify the database file you would like to use or just press Continue "

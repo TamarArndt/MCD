@@ -1,0 +1,14 @@
+
+Questionnaire[hasFocus='false'] {
+    background-color: grayLightColor;
+}
+Questionnaire[hasFocus='true'] {
+    background-color: grayLightColor; /*selectionColor;*/
+}
+
+Questionnaire QTextEdit {
+    font-size: 12.5pt;
+    border: None;
+    background-color: white;
+    qproperty-readOnly: false;
+}

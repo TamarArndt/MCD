@@ -9,17 +9,17 @@ logger = logging.getLogger()
 
 
 class ApplicationStatus():
-    def __init__(self, dbConnection, usertestMode, adaptivityMode):
-        self.databaseRange_timestamp, self.databaseRange_utc = dbqueries.determineDatabaseRange(dbConnection)
+    def __init__(self, dbConnection, adaptivityMode):
+        self.databaseRange_timestamp, self.databaseRange_timestring = dbqueries.determineDatabaseRange(dbConnection)
 
         # TODO manage timezone
         # currentDate always is a datetime.datetimeobject of the form 2017-06-01 12:31:16.064000+00:00
-        self.currentDate = self.databaseRange_utc[0]
+        self.currentDate = self.databaseRange_timestring[0]
+        logging.info('currently selected date: {}'.format(self.currentDate))
         # currentDateEntries contains a list (sorted by startTime) of stops and movements of date
         self.currentDateEntries = self.getEntriesforDate(self.currentDate, dbConnection)
         self.labelingStatusForCurrentDate = LabelingStatusOfDate(self.currentDate, self.currentDateEntries)
 
-        self.usertestMode = usertestMode
         self.adaptivityMode = adaptivityMode
         self.automaticLabelingMode = True
 
@@ -32,6 +32,7 @@ class ApplicationStatus():
         if type(date) == QtCore.QDate:
             date = QtCore.QDate.toPyDate(date)
         date = datetime.datetime.combine(date, datetime.datetime.min.time())
+        date = timehelper.localizeutc(date)
         if self.currentDate == date:
             pass
         else:
@@ -63,12 +64,12 @@ class ApplicationStatus():
 
     def startAndOriginTimeKeyEqualizer(self, entry):
         if entry['type'] == 'Stop':
-            return (entry['value'].startTime, None)
+            return entry['value'].startTime, None
         elif entry['type'] == 'Movement':
-            return (entry['value'].originTime, entry['value'].position)
+            return entry['value'].originTime, entry['value'].position
 
 
-class LabelingStatusOfDate():
+class LabelingStatusOfDate:
     def __init__(self, date, dateEntries):
         self.date = date
         self.numberOfLabeledStops = 0

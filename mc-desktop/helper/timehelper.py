@@ -1,5 +1,6 @@
 from datetime import datetime
 import pytz
+from timezonefinder import TimezoneFinder
 
 # how this works:
 """
@@ -21,6 +22,24 @@ timestamp in msec
 # timezones
 utc = pytz.utc
 cet = pytz.timezone("Europe/Berlin") # includes as well cet as cest
+# ----------------------------------------------------------------------------------
+
+
+def getPytzTimezoneFromLocation(latitude, longitude):
+    return pytz.timezone(TimezoneFinder().timezone_at(lat=latitude, lng=longitude))
+
+
+def timestamp_to_givenPytzTimezone(_timestamp, pytzTimezone):
+    _utc = timestamp_to_utc(_timestamp)
+    return utc_to_giventimezone(_utc, pytzTimezone)
+
+
+def tzawareTimestring_to_timestamp(_timestring):
+    _utc = utc.normalize(_timestring)
+    timestamp = utc_to_timestamp(_utc)
+    return timestamp
+
+# ----------------------------------------------------------------------------------
 
 
 def timestamp_to_utc(_timestamp):
@@ -49,9 +68,14 @@ def cetdatetime_to_timestamp(_cetdatetime):
     ''' input _cetdatetime must not be offset-aware/tz-aware '''
     return utc_to_timestamp(cet_to_utc(cet.localize(_cetdatetime)))
 
+
 def utcdatetime_to_timestamp(_utcdatetime):
     return utc_to_timestamp(utc.localize(_utcdatetime))
+
 
 def timestamp_to_cet(_timestamp):
     return utc_to_cet(timestamp_to_utc(_timestamp))
 
+
+def localizeutc(_utc):
+    return utc.localize(_utc)

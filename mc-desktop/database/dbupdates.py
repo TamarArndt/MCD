@@ -103,10 +103,34 @@ def splitMovementAtTime(dbConnection, movementId, splittime):
     newMovementId = newMovement.id
     session.close()
 
+    # to smoothen transition between movement segments: copy MovementLocation row at splittime to new movement segment
+    spatiaquery.spatiaUpdate('INSERT INTO MovementLocation(idMovement, time, geom) SELECT '+str(newMovementId) +', time, geom FROM MovementLocation WHERE idMovement = '+str(origMovementId)+' AND time ='+str(splittime)+';')
+    # change ownership of the segment split off
     spatiaquery.spatiaUpdate('UPDATE MovementLocation SET idMovement=' +str(newMovementId) + ' WHERE idMovement ='+ str(origMovementId) +' AND time >' + str(splittime) + ';')
     # can't update MovementLocation Table directly because of geom column
     # and the lack of a spatialite plugin for python3 --> detour via python2
 
-    # TODO split in MovementLocation needs to copy begining and end row
-    # otherwise the route is falling apart
-    # also: remove copies when split is merged again!
+
+""" Questionnaire """
+
+def updateQuestionnaireResults(dbConnection, date_timestamp, timestring, question1, question2, comment):
+    session = dbConnection.Session()
+    queryresult = session.query(dbConnection.QuestionnaireResults).filter(dbConnection.QuestionnaireResults.time == date_timestamp).first()
+    if queryresult:
+        # update that row
+        setattr(queryresult, 'question_1', question1)
+        setattr(queryresult, 'question_2', question2)
+        setattr(queryresult, 'comment', comment)
+
+    else: # if not already existent
+        newQuestionnaireResult = dbConnection.QuestionnaireResults(time=date_timestamp,
+                                                                   time_string=timestring,
+                                                                   question_1=question1,
+                                                                   question_2=question2,
+                                                                   comment=comment)
+
+        session.add(newQuestionnaireResult)
+
+    session.commit()
+    session.close()
+

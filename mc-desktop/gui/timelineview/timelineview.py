@@ -1,4 +1,3 @@
-import os, sys
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSvg
 from gui.timelineview import timelineheader, timelinecontent, waitingspinnerwidget
 from gui.style import styleparser
@@ -18,13 +17,11 @@ class TimelineView(QtWidgets.QWidget):
         QtWidgets.QWidget.__init__(self)
 
         stylesheetFilename = 'timelinestylesheet.css'
-        processedstylesheetPath = styleparser.preprocessStylesheet(stylesheetFilename)
-        with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
-            processedstylesheet = file.read()
-            self.setStyleSheet(processedstylesheet)
+        styleparser.StylesheetParser().setProcessedStyleSheet(stylesheetFilename, self)
 
         self.timelineHeader = timelineheader.TimelineHeader(appStatus)
         self.timelineContent = timelinecontent.TimelineContent(appStatus, dbConnection, mapview)
+        # self.setMinimumWidth(self.timelineContent.timeline.widthHint)
 
         # self.waitingSpinner = waitingspinnerwidget.QtWaitingSpinner(parent=self.timelineHeader)
         # self.waitingSpinner.start()

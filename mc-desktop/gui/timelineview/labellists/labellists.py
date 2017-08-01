@@ -8,138 +8,6 @@ from database import dbupdates, dbqueries
 # --------------------------------------------------------------------------------------------
 # Stop
 # --------------------------------------------------------------------------------------------
-class StopLabelWidgetUsertestMode(QtWidgets.QWidget):
-    def __init__(self, stopId, placeTypeLabel, isConfirmed, flagAutomaticLabeling,
-                 dbConnection, appStatus, correspondingListItem, addressCommaSeparated):
-        QtWidgets.QWidget.__init__(self)
-        self.correspondingListItem = correspondingListItem
-        self.isConfirmed = isConfirmed
-        self.address = addressCommaSeparated
-        self.setProperty('isConfirmed', isConfirmed)
-
-        self.combobox = StopLabelList(correspondingListItem, isConfirmed)
-
-        # if automaticLabelingMode is disabled, change flagAutomaticLabeling only locally,
-        # in order to ignore the automatic labeling cases
-        if not appStatus.automaticLabelingMode:
-            if flagAutomaticLabeling == 1:
-                flagAutomaticLabeling = 0
-
-        if isConfirmed:
-            self.combobox.setCurrentText(placeTypeLabel)
-
-        elif not isConfirmed:
-
-            if appStatus.adaptivityMode:
-                suggestions = self.getLabelSuggestionsIncludingClusterAssociationIfExistent(dbConnection,
-                                                                                            stopId, flagAutomaticLabeling,
-                                                                                            placeTypeLabel)
-                if not suggestions:  # if False returned: proceed the same way as in non-adaptive mode
-                    print('no suggestions')
-                    if flagAutomaticLabeling == 1:
-                        print('no suggestions: only autolabel')
-                        self.combobox.insertSeparator(0)
-                        cluserAssociatedLabel = placeTypeLabel
-                        icon = iconfactory.getStopLabelIcon(cluserAssociatedLabel)
-                        self.combobox.insertItem(0, icon, cluserAssociatedLabel)
-                        self.combobox.setItemData(0, getColorForConfidence(0.6), QtCore.Qt.BackgroundRole)
-                        #self.combobox.insertItem(0, 'label suggestion:')
-                        #self.combobox.setItemData(0, QtCore.QVariant(0), QtCore.Qt.UserRole-1)  # disable item
-                    self.combobox.insertUnknownTop()
-                    self.combobox.setCurrentText('Unknown')
-
-                else:  # if suggestion worked
-                    self.combobox.insertSeparator(0)
-                    for suggestion in suggestions:
-                        label = suggestion[0]
-                        confidence = suggestion[1]
-                        icon = iconfactory.getStopLabelIcon(label)
-                        self.combobox.insertItem(0, icon, str(label))
-                        self.combobox.setItemData(0, getColorForConfidence(confidence), QtCore.Qt.BackgroundRole)
-                    #self.combobox.insertItem(0, 'label suggestions:')
-                    #self.combobox.setItemData(0, QtCore.QVariant(0), QtCore.Qt.UserRole-1)  # disable item
-                    self.combobox.insertUnknownTop()
-                    self.combobox.setCurrentText('Unknown')
-
-            elif not appStatus.adaptivityMode:
-                if flagAutomaticLabeling == 1:
-                    self.combobox.insertSeparator(0)
-                    cluserAssociatedLabel = placeTypeLabel
-                    icon = iconfactory.getStopLabelIcon(cluserAssociatedLabel)
-                    self.combobox.insertItem(0, icon, cluserAssociatedLabel)
-                    self.combobox.setItemData(0, getColorForConfidence(0.6), QtCore.Qt.BackgroundRole)
-                    #self.combobox.insertItem(0, 'label suggestion:')
-                    #self.combobox.setItemData(0, QtCore.QVariant(0), QtCore.Qt.UserRole-1)  # disable item
-                self.combobox.insertUnknownTop()
-                self.combobox.setCurrentText('Unknown')
-
-        self.combobox.currentIndexChanged.connect(lambda: self.indexChangedAction(dbConnection, appStatus,
-                                                                                  stopId, self.combobox.currentText()))
-
-        hlayout = QtWidgets.QVBoxLayout()
-        hlayout.setContentsMargins(0, 0, 0, 0)
-        hlayout.addWidget(self.combobox)
-        hlayout.setAlignment(self.combobox, QtCore.Qt.AlignLeft)
-        self.setLayout(hlayout)
-
-    def setConfirmed(self):
-        self.isConfirmed = True
-        self.setProperty('isConfirmed', True)
-        self.style().unpolish(self)
-        self.style().polish(self)
-        self.update()
-
-    def getLabelSuggestionsIncludingClusterAssociationIfExistent(self, dbConnection, stopId, flagAutomaticLabeling, placeTypeLabel):
-        """ returns a sorted list of the most probable labels
-        if a cluster association exists, the associated label is integrated into the list, weighted by clusterAssociationWeight
-        returns False if semantic place labeling can't provide the confidences """
-        #classificationresult = True #semanticplacelabeling.getLabelConfidencesForStopId(stopId)
-        # for usertest mode: just query LabelConfidences for stopId in Stops table
-        classificationresult = eval(dbqueries.getLabelConfidencesForStopId(dbConnection=dbConnection, stopId=stopId)[0])
-        if not classificationresult:  # if None
-            return False
-        else:
-            confidences = classificationresult
-            # confidences is a dictionary of the form:
-            # {'Friend & Family': 0.11539636746500072, 'Work': 0.08386752304450037, 'Home': 0.6879473186848128}
-            if flagAutomaticLabeling == 1:  # there is a cluster-associated label
-                clusterAssociatedLabel = placeTypeLabel
-                clusterAssociationWeight = 0.2
-                if clusterAssociatedLabel in confidences:
-                    confidences[clusterAssociatedLabel] += clusterAssociationWeight
-                    # make sure probability is not greater than 1
-                    if confidences[clusterAssociatedLabel] > 1.0:
-                        confidences[clusterAssociatedLabel] = 1.0
-                else:
-                    confidences[clusterAssociatedLabel] = clusterAssociationWeight
-            # sort suggestions by confidence
-            # confidencesSorted is a list of the form:
-            # [('Work', 0.08386752304450037), ('Friend & Family', 0.11539636746500072), ('Home', 0.6879473186848128)]
-            confidencesSorted = sorted(confidences.items(), key=operator.itemgetter(1))
-            return confidencesSorted
-
-    def indexChangedAction(self, dbConnection, appStatus, stopId, newPlaceTypeLabel):
-        if not self.isConfirmed:
-            self.setConfirmed()
-        if not self.combobox.isConfirmed:
-            self.combobox.confirm(appStatus)
-
-        # update Label in db for this stop
-        placeTypesKeyByValue = dict((v,k) for k, v in placeTypesList.items())
-        newPlaceTypeId = placeTypesKeyByValue[newPlaceTypeLabel]
-        dbupdates.updateStopLabel(dbConnection, appStatus, stopId, newPlaceTypeId, newPlaceTypeLabel)
-
-        if not newPlaceTypeLabel == 'Detection is completely wrong':
-            if appStatus.automaticLabelingMode:
-                # if stops clusterId already associated with newPlaceTypeLabel: don't ask to associate again
-                clusterId = dbqueries.getClusterIdFromStopId(dbConnection, stopId)
-                alreadyAssociated = dbqueries.isClusterIdAssociatedWithPlaceTypeLabel(dbConnection, clusterId, newPlaceTypeLabel)
-                if not alreadyAssociated:
-                    logging.info("automaticLabelingQuestion shown")
-                    index = self.correspondingListItem.listWidget().currentRow() + 1
-                    self.correspondingListItem.listWidget().insertAutoLabelQuestion(index, dbConnection, stopId, newPlaceTypeLabel)
-
-
 class StopLabelWidget(QtWidgets.QWidget):
     def __init__(self, stopId, placeTypeLabel, isConfirmed, flagAutomaticLabeling,
                  dbConnection, appStatus, correspondingListItem, addressCommaSeparated):
@@ -419,16 +287,15 @@ class MovementLabelWidget(QtWidgets.QWidget):
         hlayout.addWidget(self.combobox, 1)
         hlayout.setAlignment(self.combobox, QtCore.Qt.AlignLeft)
 
-        if not appStatus.usertestMode:
-            # spacing workaround
-            labelConfirmButton = QtWidgets.QPushButton('Ok')
-            labelConfirmButton.setObjectName('smallButton')
-            labelConfirmButton.hide()
-            retainSizePolicy = labelConfirmButton.sizePolicy()
-            retainSizePolicy.setRetainSizeWhenHidden(True)
-            labelConfirmButton.setSizePolicy(retainSizePolicy)
-            hlayout.addSpacing(7)
-            hlayout.addWidget(labelConfirmButton, 0)
+        # spacing workaround
+        labelConfirmButton = QtWidgets.QPushButton('Ok')
+        labelConfirmButton.setObjectName('smallButton')
+        labelConfirmButton.hide()
+        retainSizePolicy = labelConfirmButton.sizePolicy()
+        retainSizePolicy.setRetainSizeWhenHidden(True)
+        labelConfirmButton.setSizePolicy(retainSizePolicy)
+        hlayout.addSpacing(7)
+        hlayout.addWidget(labelConfirmButton, 0)
 
         self.setLayout(hlayout)
 
@@ -569,4 +436,4 @@ def getColorForConfidence(confidence):
         a = 160
     if 0.75 < confidence < 1:
         a = 220
-    return QtGui.QColor(41, 166, 0, a)
+    return QtGui.QColor(0, 194, 13, a) # 21, 181, 0, a) # 41, 166, 0, a)

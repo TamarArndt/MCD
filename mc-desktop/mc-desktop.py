@@ -16,38 +16,18 @@ logger = logging.getLogger()
 
 if __name__ == '__main__':
     try:
-        # --------------------------------------------------------------------------------
-        # optional arguments on startup: only for usertest
-        # --------------------------------------------------------------------------------
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--usertestmode', help='enables usertest mode')
-        parser.add_argument('--adaptivitymode', help='enables adaptive label suggestions generated with semantic place labeling algorithm, can also be changed from within the app')
-        args = parser.parse_args()
+        adaptivityMode = False
 
-        # set to True if argument is given
-        if args.usertestmode:
-            usertestMode = args.usertestmode  # True
-        else:
-            usertestMode = True #False
-        if args.adaptivitymode:
-            adaptivityMode = args.adaptivitymode  # True
-        else:
-            adaptivityMode = False
-
-        logger.info("start programm | UsertestMode: %s | AdaptivityMode: %s", usertestMode, adaptivityMode )
+        logger.info("starting programm | AdaptivityMode: %s", adaptivityMode )
         # --------------------------------------------------------------------------------
         # application
         # --------------------------------------------------------------------------------
         app = QtWidgets.QApplication(sys.argv)
         QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedKingdom))
-        MAIN_DIR = os.path.dirname(sys.modules['__main__'].__file__)  # TODO MAIN_DIR not working on windows
 
         # set main stylesheet
         stylesheetFilename = 'mainstylesheet.css'
-        processedstylesheetPath = styleparser.preprocessStylesheet(stylesheetFilename)
-        with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
-            processedstylesheet = file.read()
-            app.setStyleSheet(processedstylesheet)
+        styleparser.StylesheetParser().setProcessedStyleSheet(stylesheetFilename, app)
 
         # --------------------------------------------------------------------------------
         # path configuration
@@ -68,17 +48,14 @@ if __name__ == '__main__':
         # set up application status object
         # --------------------------------------------------------------------------------
         dbConnection = dbconnection.DatabaseConnection(DB_PATH)
-        if not usertestMode:
-            dbqueries.mergeConsecutiveMovementsWithSameTravelMode(dbConnection)
-        appStatus = applicationstatus.ApplicationStatus(dbConnection, usertestMode, adaptivityMode)
+        dbqueries.mergeConsecutiveMovementsWithSameTravelMode(dbConnection)
+        appStatus = applicationstatus.ApplicationStatus(dbConnection, adaptivityMode)
 
         # --------------------------------------------------------------------------------
-        # start main application window and welcome message
+        # start main application window
         # --------------------------------------------------------------------------------
-        # optional welcome window
-        if usertestMode:
-           welcome = welcomewindow.WelcomeDialog(appStatus)
-           welcome.show()
+        welcome = welcomewindow.WelcomeDialog(appStatus)
+        welcome.show()
 
         mainWindow = mainwindow.MainWindow(appStatus, dbConnection)
         mainWindow.show()

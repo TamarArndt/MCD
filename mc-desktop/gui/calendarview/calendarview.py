@@ -6,8 +6,7 @@ class CalendarView(QtWidgets.QWidget):
     def __init__(self, appStatus):
         super(CalendarView, self).__init__()
 
-        dbrange_utc = appStatus.databaseRange_utc
-        self.calendar = MyCalendar(dbrange_utc)
+        self.calendar = MyCalendar(appStatus.databaseRange_timestring)
         self.setFixedWidth(self.calendar.width() + 20)
 
         vlayout = QtWidgets.QVBoxLayout()
@@ -35,10 +34,7 @@ class MyCalendar(QtWidgets.QCalendarWidget):
 
         # style
         stylesheetFilename = 'calendarstylesheet.css'
-        processedstylesheetPath = styleparser.preprocessStylesheet(stylesheetFilename)
-        with open(processedstylesheetPath, 'r', encoding='utf-8') as file:
-            processedstylesheet = file.read()
-            self.setStyleSheet(processedstylesheet)
+        styleparser.StylesheetParser().setProcessedStyleSheet(stylesheetFilename, self)
 
         self.setFixedHeight(210)
         self.setFixedWidth(240)

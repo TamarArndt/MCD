@@ -2,13 +2,16 @@ import os, sys
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSvg
 from database import dbconnection
 from configuration import configuration
+from helper.filehelper import FileHelper
+
 
 class PathConfigurationDialog(QtWidgets.QDialog):
     def __init__(self):
         QtWidgets.QDialog.__init__(self)
         QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+W"), self, self.close)
         self.setWindowTitle("Filepath settings")
-        self.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'mc-logo.svg')))
+        PROJECT_DIR = FileHelper().get_project_cwd()
+        self.setWindowIcon(QtGui.QIcon(os.path.join(PROJECT_DIR, 'res', 'mc-logo.svg')))
         self.setModal(True)
         self.setMinimumWidth(550)
 
@@ -18,7 +21,9 @@ class PathConfigurationDialog(QtWidgets.QDialog):
 
         # ----------------------------------------------------
         # DATABASE FIILE
-        dbtext = QtWidgets.QLabel('Please be aware, that if you change the database path the application needs to be restartet for the new setting to take effect. You can always specify a different database path on startup.')
+        dbtext = QtWidgets.QLabel('Please be aware, that if you change the database path the application needs '
+                                  'to be restartet for the new setting to take effect. You can always specify a '
+                                  'different database path on startup.')
         dbtext.setWordWrap(True)
         dblayout1 = QtWidgets.QHBoxLayout()
         dblayout1.addWidget(QtWidgets.QLabel('<strong>database file</strong>'))
@@ -42,7 +47,9 @@ class PathConfigurationDialog(QtWidgets.QDialog):
 
         # ----------------------------------------------------
         # JAR FILE
-        jarmodeltext = QtWidgets.QLabel('The .jar and .model files are used for generating label suggestions in adaptivity mode. If adaptivity mode is turned off, changing their paths will not have any effect.')
+        jarmodeltext = QtWidgets.QLabel('The .jar and .model files are used for generating label suggestions '
+                                        'in adaptivity mode. If adaptivity mode is turned off, changing their '
+                                        'paths will not have any effect.')
         jarmodeltext.setWordWrap(True)
 
         jarpathedit = QtWidgets.QLineEdit(str(self.defaultJarPath))
@@ -152,7 +159,8 @@ class PathConfigurationDialog(QtWidgets.QDialog):
                 dbconnection.DatabaseConnection(dbpath)
             except Exception as e:
                 self.dberrormessage.setText('The given database file seems not to have the right content. <br>'
-                                          'Please use a database that contains sensor data logged by the Mobility Companion Android/iOS App.')
+                                            'Please use a database that contains sensor data logged by the '
+                                            'Mobility Companion Android/iOS App.')
                 self.okbutton.setEnabled(False)
                 return False
             self.dberrormessage.setText('')

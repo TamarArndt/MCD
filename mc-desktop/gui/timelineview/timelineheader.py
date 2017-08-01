@@ -53,8 +53,8 @@ class DateLabel(QtWidgets.QLabel):
     def __init__(self, appStatus):
         QtWidgets.QLabel.__init__(self)
 
-        self.minimumDate = QtCore.QDate(appStatus.databaseRange_utc[0])
-        self.maximumDate = QtCore.QDate(appStatus.databaseRange_utc[1])
+        self.minimumDate = QtCore.QDate(appStatus.databaseRange_timestring[0])
+        self.maximumDate = QtCore.QDate(appStatus.databaseRange_timestring[1])
 
         self.currentDate = QtCore.QDate(appStatus.currentDate)
         self.setText(self.currentDate.toString(QtCore.Qt.DefaultLocaleLongDate))

@@ -124,6 +124,9 @@ QComboBox::drop-down {
 QComboBox:item:disabled {
     color: grey;
 }
+QComboBox QAbstractItemView {
+    /*border: 3px solid cadetblue;*/
+}
 
 /*
 QComboBox QAbstractItemView::item {
@@ -135,3 +138,4 @@ QAbstractItemView::item {
     min-height: 50px;
 }
 */
+

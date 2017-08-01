@@ -1,5 +1,6 @@
 import os, sys
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSvg
+from helper.filehelper import FileHelper
 
 class AboutWindow(QtWidgets.QDialog):
     def __init__(self):
@@ -8,12 +9,13 @@ class AboutWindow(QtWidgets.QDialog):
 
         # window settings
         self.setWindowTitle("About Mobility Companion Desktop")
-        self.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'mc-logo.svg')))
+        PROJECT_DIR = FileHelper().get_project_cwd()
+        self.setWindowIcon(QtGui.QIcon(os.path.join(PROJECT_DIR, 'res', 'mc-logo.svg')))
         screen = QtWidgets.QDesktopWidget().availableGeometry()
         self.setFixedHeight(screen.height()/2)
         self.setFixedWidth(screen.width()/3)
 
-        logo = QtSvg.QSvgWidget(os.path.join(os.path.dirname(sys.modules['__main__'].__file__), 'res', 'mc-logo.svg'))
+        logo = QtSvg.QSvgWidget(os.path.join(PROJECT_DIR, 'res', 'mc-logo.svg'))
         logo.setFixedSize(100, 100)
         aboutText = QtWidgets.QTextEdit()
 
