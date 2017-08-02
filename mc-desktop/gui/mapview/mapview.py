@@ -17,10 +17,18 @@ class MapView(QtWidgets.QWidget):
         self.alwaysShowEntirePath = alwaysShowEntirePath
         self.dbConnection = dbConnection
 
-        self.mapspace = QtQuickWidgets.QQuickWidget()
-        self.mapspace.rootContext().setContextProperty("projectDirectory", PROJECT_DIR)
-        self.mapspace.setSource(QtCore.QUrl(os.path.join(PROJECT_DIR, 'gui', 'mapview', 'mymap.qml')))
-        self.mapspace.setResizeMode(QtQuickWidgets.QQuickWidget.SizeRootObjectToView)
+        # self.mapspace = QtQuickWidgets.QQuickWidget()
+        # # set paths to location markers
+        # self.mapspace.rootContext().setContextProperty("LocationMarkerSmall", os.path.join(PROJECT_DIR, 'res', 'location_marker_small.svg'))
+        # self.mapspace.rootContext().setContextProperty("LocationMarker", os.path.join(PROJECT_DIR, 'res', 'location_marker.svg'))
+        # self.mapspace.rootContext().setContextProperty("LocationMarkerSplit", os.path.join(PROJECT_DIR, 'res', 'location_marker_split.svg'))
+        #
+        # self.mapspace.setSource(QtCore.QUrl(os.path.join(PROJECT_DIR, 'gui', 'mapview', 'mymap.qml')))
+        # self.mapspace.setResizeMode(QtQuickWidgets.QQuickWidget.SizeRootObjectToView)
+
+        from gui.mapview.mapwidget import MapWidget
+        self.mapspace = MapWidget()
+
 
         # placeholder for splitwidget to refer to when hiding
         self.split = QtWidgets.QFrame()
@@ -40,7 +48,7 @@ class MapView(QtWidgets.QWidget):
 
         # on startup show dayroute for initally selected date
         self.showRouteOfCurrentDateOnMap(appStatus)
-        self.mapspace.rootObject().fitMap()
+        #self.mapspace.rootObject().fitMap()
 
     def showRouteOfCurrentDateOnMap(self, appStatus):
         """ shows all paths of the current date as one long route of the day """
@@ -118,6 +126,7 @@ class MapView(QtWidgets.QWidget):
                                                                  markersdictlist[0]['longitude'],
                                                                  markersdictlist[-1]['latitude'],
                                                                  markersdictlist[-1]['longitude'])
+                #self.mapspace.rootObject().fitMap()
 
     def showSplitMarker(self, dictpoint):
         self.mapspace.rootObject().setSplitMarker(dictpoint)

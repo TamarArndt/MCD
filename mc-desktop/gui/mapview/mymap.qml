@@ -6,9 +6,9 @@ import QtPositioning 5.5
 
 Rectangle {
     // width and height are overwritten by Map: anchors.fill: parent
-    width: 600
-    height: 400
-    visible: true
+    width: 100
+    height: 100
+    //visible: true
 
     //property variant fitRect
 
@@ -46,6 +46,19 @@ Rectangle {
         PluginParameter { name: "mapbox.access_token"; value: "pk.eyJ1IjoidGFtYXJhcm5kdCIsImEiOiJjajRpOHoyb2MwNjFnMzNzZXNwMHRldzAwIn0.fDH3VtBeCN5F-eUybyx1_w" }
     }
 
+    Plugin {
+        id: osmPlugin
+        name: "osm"
+        PluginParameter { name: "osm.useragent"; value: "Mobility-Companion-Desktop" }
+        //PluginParameter { name: "osm.mapping.host"; value: "https://www.mediawiki.org/wiki/Maps" }
+        //PluginParameter { name: "osm.mapping.host"; value: "http://osm.tile.server.address/" }
+
+
+        //PluginParameter { name: "osm.mapping.copyright"; value: "All mine" }
+        //PluginParameter { name: "osm.routing.host"; value: "http://osrm.server.address/viaroute" }
+        //PluginParameter { name: "osm.geocoding.host"; value: "http://geocoding.server.address" }
+    }
+
     Map {
         id: mymap
         anchors.fill: parent
@@ -55,7 +68,7 @@ Rectangle {
            longitude: 174.785786
         }
         maximumZoomLevel: 18.5
-        zoomLevel: 15 //10
+        zoomLevel: 18.5 //10
         MapPolyline{
             id: pathEntireDay
             line.width: 3
@@ -73,7 +86,7 @@ Rectangle {
 
                 sourceItem: Image {
                     id: locationmarker
-                    source: projectDirectory + "/res/location_marker_small.svg" // TODO path
+                    source: LocationMarkerSmall
                 }
             }
         }
@@ -95,7 +108,7 @@ Rectangle {
 
                 sourceItem: Image {
                     id: locationmarker
-                    source: projectDirectory + "/res/location_marker.svg" // TODO path
+                    source: LocationMarker
                 }
             }
         }
@@ -110,7 +123,7 @@ Rectangle {
 
                 sourceItem: Image {
                     id: locationmarker
-                    source: projectDirectory + "/res/location_marker_split.svg" // TODO path
+                    source: LocationMarkerSplit
                 }
             }
         }
@@ -162,11 +175,14 @@ Rectangle {
     // FIT MAP
     // set center and zoomLevel according to overlay items
     function fitMap() {
-        mymap.fitViewportToMapItems()
+        //mymap.fitViewportToMapItems()
+        mymap.fitViewportToVisibleMapItems()
+        mymap.maximumZoomLevel = 18.5
     }
 
     function fitMapToSelectedItems(lat1, long1, lat2, long2) {
         mymap.visibleRegion = QtPositioning.rectangle([QtPositioning.coordinate(lat1, long1), QtPositioning.coordinate(lat2, long2)])
+        mymap.maximumZoomLevel = 18.5
     }
 
 
