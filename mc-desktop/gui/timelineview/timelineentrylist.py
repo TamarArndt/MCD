@@ -71,7 +71,8 @@ class Timeline(QtWidgets.QListWidget):
         self.takeItem(index)
         self.setFixedHeight(self.listHeight)
         if updateNecessary:
-            self.updateNecessary.emit()
+            pass
+            #self.updateNecessary.emit()
 
 
 class MyListWidgetItem(QtWidgets.QListWidgetItem):

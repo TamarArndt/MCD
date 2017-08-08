@@ -1,0 +1,114 @@
+
+/* ---- MainWindow --------------------------------------------------------------------- */
+* {
+    font-family: Tahoma, Geneva, Impact, Charcoal, sans-serif;
+    /*font-family: Arial, Helvetica, sans-serif; /* "Ubuntu Beta", "Bitstream Vera Sans", DejaVu Sans, Tahoma, sans-serif;*/
+    font-size: 11.5pt;
+    color: #333333;
+}
+
+QMainWindow QSplitter::handle {
+    border: none;
+    height: 6px;
+    background-color: #d3d3d3;
+}
+/* not working */
+QMainWindow QSplitter::handle:hover {
+    background-color: red;
+}
+
+
+QMainWindow QStatusBar {
+    background-color: #d3d3d3;
+}
+QMainWindow QStatusBar QLabel {
+    background-color: transparent;
+}
+QMainWindow QToolBar {
+    padding: 5px;
+}
+QMainWindow QToolBar QToolButton {
+    padding: 5px;
+    min-width: 10px;
+    height: 15px;
+}
+
+QDialog {
+    font-size: 14pt;
+}
+QTextEdit {
+    font-size: 12.5pt;
+    border: None;
+    background-color: transparent;
+    qproperty-readOnly: true;
+}
+
+
+/* ---- some recurring items --------------------------------------------------------------------- */
+
+QPushButton {
+    background-color: white;
+    border: 1px solid transparent;
+    padding: 8px;
+    width: 90px;
+    border-radius: 3px;
+}
+
+QPushButton:disabled {
+    color: #d3d3d3;
+}
+QPushButton:focus:pressed {
+    background-color: #d3d3d3;
+}
+
+
+QPushButton#okButton {
+    background-color: #507EB1;
+    color: white;
+    /*width: 90px;*/
+}
+
+QPushButton#okButton:disabled {
+    background-color: #e6e6e6;
+    color: #808080;
+    border: 1px solid #d3d3d3;
+}
+QPushButton#okButton:focus:pressed {
+    background-color: lightblue;
+}
+
+
+
+QPushButton#smallButton {
+    background-color: #507EB1;
+    color: white;
+    border: none;
+    width: 35px;
+    padding: 6px;
+}
+
+QPushButton#smallButton:disabled {
+    background-color: #e6e6e6;
+    color: darkgray;
+    border: 1px solid #d3d3d3;
+}
+QPushButton#smallButton:focus:pressed {
+    background-color: #d3d3d3;
+}
+
+
+QLabel[type='error'] {
+    color: #ae2323;
+}
+
+
+QLabel#importantLabel {
+    font-size: 12pt;
+    /*font-weight: 600;*/
+    /*qproperty-alignment: AlignCenter;*/
+}
+
+QFrame#automaticLabelingQuestion {
+    background-color: white;
+    /*border: 2px solid #ae2323;*/
+}

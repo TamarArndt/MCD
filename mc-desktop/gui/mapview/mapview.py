@@ -47,7 +47,7 @@ class MapView(QtWidgets.QWidget):
         self.setLayout(self.vlayout)
 
         # on startup show dayroute for initally selected date
-        self.showRouteOfCurrentDateOnMap(appStatus)
+        #self.showRouteOfCurrentDateOnMap(appStatus)
         #self.mapspace.rootObject().fitMap()
 
     def showRouteOfCurrentDateOnMap(self, appStatus):
@@ -79,6 +79,7 @@ class MapView(QtWidgets.QWidget):
         else:
             self.mapspace.rootObject().setPathSelectedEntry(pathdictlist)
             self.mapspace.rootObject().setMarkersSelectedEntry(markersdictlist)
+
         self.mapspace.rootObject().fitMap()
 
     def showSelectedEntryOnMap(self, appStatus, entryIndex, isDoubleClicked):

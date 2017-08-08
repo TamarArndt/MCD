@@ -1,0 +1,14 @@
+
+Questionnaire[hasFocus='false'] {
+    background-color: #e6e6e6;
+}
+Questionnaire[hasFocus='true'] {
+    background-color: #e6e6e6; /*#96D4A1;*/
+}
+
+Questionnaire QTextEdit {
+    font-size: 12.5pt;
+    border: None;
+    background-color: white;
+    qproperty-readOnly: false;
+}

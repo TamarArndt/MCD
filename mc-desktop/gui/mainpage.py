@@ -13,7 +13,7 @@ class MainPage(QtWidgets.QWidget):
 
         # components of MainPage
         self.calendar_view = calendarview.CalendarView(appStatus)
-        self.map_view = mapview.MapView(appStatus, dbConnection, alwaysShowEntirePath=True)
+        self.map_view = mapview.MapView(appStatus, dbConnection, alwaysShowEntirePath=False)
         self.timeline_view = timelineview.TimelineView(appStatus, dbConnection, self.map_view)
 
         splitter = QtWidgets.QSplitter()

@@ -52,6 +52,7 @@ class StopLabelWidget(QtWidgets.QWidget):
             self.combobox.setCurrentText(placeTypeLabel)
 
         elif not isConfirmed:
+            print('in case: not confirmed')
             if appStatus.adaptivityMode:
                 suggestions = self.getLabelSuggestionsIncludingClusterAssociationIfExistent(stopId, flagAutomaticLabeling,
                                                                                             placeTypeLabel)
@@ -64,6 +65,7 @@ class StopLabelWidget(QtWidgets.QWidget):
                         self.combobox.insertItem(0, icon, cluserAssociatedLabel)
                         self.combobox.setItemData(0, getColorForConfidence(0.6), QtCore.Qt.BackgroundRole)
                         self.combobox.setCurrentIndex(0)
+                        print('current index: ', self.combobox.currentIndex(), self.combobox.currentText())
                         self.labelConfirmButton.setEnabled(True)
                         self.hintAutomaticLabeling.setHidden(False) #show()
                         self.hintAutomaticLabeling.setText('automatically labeled:')
@@ -98,7 +100,7 @@ class StopLabelWidget(QtWidgets.QWidget):
                     self.combobox.setItemData(0, getColorForConfidence(0.6), QtCore.Qt.BackgroundRole)
                     self.combobox.setCurrentIndex(0)
                     self.labelConfirmButton.setEnabled(True)
-                    self.hintAutomaticLabeling.setHidden(False) #show()
+                    self.hintAutomaticLabeling.setHidden(False)  # show()
                     self.hintAutomaticLabeling.setText('automatically labeled:')
                 else:
                     self.combobox.insertUnknownTop()
@@ -131,7 +133,7 @@ class StopLabelWidget(QtWidgets.QWidget):
         """ returns a sorted list of the most probable labels
         if a cluster association exists, the associated label is integrated into the list, weighted by clusterAssociationWeight
         returns False if semantic place labeling can't provide the confidences """
-        classificationresult = semanticplacelabeling.getLabelConfidencesForStopId(stopId)
+        classificationresult = False # semanticplacelabeling.getLabelConfidencesForStopId(stopId)
         if not classificationresult:
             return False
         else:
@@ -243,12 +245,14 @@ class StopLabelList(QtWidgets.QComboBox):
 
 
     def insertUnknownTop(self):
+        print('insertUnknownTop')
         self.insertSeparator(0)
         icon = iconfactory.getStopLabelIcon('Unknown')
         self.insertItem(0, icon, 'Unknown')
 
     def confirm(self, appStatus):
         # remove 'Unknown'
+        print('remove unknown from list')
         if self.itemText(0) == 'Unknown':
             self.blockSignals(True)
             self.removeItem(0)

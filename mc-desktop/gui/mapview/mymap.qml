@@ -50,25 +50,18 @@ Rectangle {
         id: osmPlugin
         name: "osm"
         PluginParameter { name: "osm.useragent"; value: "Mobility-Companion-Desktop" }
-        //PluginParameter { name: "osm.mapping.host"; value: "https://www.mediawiki.org/wiki/Maps" }
-        //PluginParameter { name: "osm.mapping.host"; value: "http://osm.tile.server.address/" }
-
-
-        //PluginParameter { name: "osm.mapping.copyright"; value: "All mine" }
-        //PluginParameter { name: "osm.routing.host"; value: "http://osrm.server.address/viaroute" }
-        //PluginParameter { name: "osm.geocoding.host"; value: "http://geocoding.server.address" }
     }
 
     Map {
         id: mymap
         anchors.fill: parent
-        plugin: mapboxPlugin
+        plugin: osmPlugin
         center {
            latitude: -41.271233
            longitude: 174.785786
         }
         maximumZoomLevel: 18.5
-        zoomLevel: 18.5 //10
+        zoomLevel: 10 //10
         MapPolyline{
             id: pathEntireDay
             line.width: 3
@@ -175,8 +168,8 @@ Rectangle {
     // FIT MAP
     // set center and zoomLevel according to overlay items
     function fitMap() {
-        //mymap.fitViewportToMapItems()
-        mymap.fitViewportToVisibleMapItems()
+        mymap.fitViewportToMapItems()
+        //mymap.fitViewportToVisibleMapItems()
         mymap.maximumZoomLevel = 18.5
     }
 

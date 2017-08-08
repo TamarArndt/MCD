@@ -1,0 +1,16 @@
+
+
+QLabel {
+    padding: 16px;
+    font-size: 12pt;
+}
+QLabel[status='noEntries'] {
+    background-color: #A6A6A6;
+}
+QLabel[status='fullyLabeled'] {
+    background-color: #66C978;
+}
+QLabel[status='partiallyLabeled'] {
+    background-color: #FFCB3B;
+}
+
